@@ -38,6 +38,7 @@
 ! method        --> integer determining which integrator to use
 !
 ! NUMTHREAD     --> number of parallel OMP threads
+!
 
 
 SUBROUTINE RK_SOLV(EdMat, ProdMat, RateVec, ConcVec, dtime, finaltime, method, NUMTHREAD)
