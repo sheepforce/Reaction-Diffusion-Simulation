@@ -47,14 +47,14 @@ USE omp_lib                                                                     
 
 IMPLICIT NONE
 
-INCLUDE 'reactionkinetics.fh'                                                                           ! include type declarations
+INCLUDE 'rk_solv.fh'											! include type declarations
 
 REAL*8 ::  DiffEquation
 INTERFACE
         FUNCTION DiffEquation(EdMat, ProdMat, RateVec, ConcVec, SubsNum)
                 IMPLICIT NONE
 
-                INCLUDE 'reactionkinetics.fh'
+                INCLUDE 'rk_solv.fh'
 
                 REAL*8 :: ConcMultiEduct, ConcMultiProduct, SumEduct, SumProd                           ! interim results of ODE
         END FUNCTION DiffEquation
@@ -121,7 +121,7 @@ END SUBROUTINE RK_SOLV
 REAL*8 FUNCTION DiffEquation(EdMat, ProdMat, RateVec, ConcVec, SubsNum)                                 ! Calculate Initial Value of ODE by using 
 IMPLICIT NONE
 
-INCLUDE 'reactionkinetics.fh'
+INCLUDE 'rk_solv.fh'
 
 REAL*8 :: ConcMultiEduct, ConcMultiProduct, SumEduct, SumProd                                           ! interim results of ODE
 

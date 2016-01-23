@@ -37,11 +37,11 @@
 ! NUMTHREAD     --> number of parallel OMP Threads
 
 
-INTEGER, DIMENSION(:,:) :: EdMat , ProdMat
+INTEGER, DIMENSION(:,:), INTENT(IN) :: EdMat, ProdMat
 INTEGER :: Omega, N, I, lambda, SubsNum, NSteps, IntStep
 
 REAL*8, DIMENSION(:,:), ALLOCATABLE :: IntConcMat
-REAL*8, DIMENSION(:) :: RateVec , ConcVec
+REAL*8, DIMENSION(:), INTENT(IN) :: RateVec , ConcVec
 REAL*8 :: dtime, finaltime
 REAL*8, PARAMETER :: starttime = 0.0d0
 
