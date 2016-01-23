@@ -11,3 +11,5 @@ test_rk_solv: rk_solv
 clean:
 	rm *.o
 	rm *.bin
+	rm *.dat
+	rm *.log
