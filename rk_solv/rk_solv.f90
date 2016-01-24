@@ -211,6 +211,7 @@ IMPLICIT NONE
 INCLUDE 'rk_solv.fh'
 
 REAL*8 :: ConcMultiConsume, ConcMultiProduce, SumConsume, SumProduce					! interim results of ODE
+REAL*8 :: SC, SP
 
 !!=============!!
 !! START DEBUG !!
@@ -229,8 +230,8 @@ Omega = SIZE(ConcVec)                                                           
 N = SIZE(RateVec)
 
 ConcMultiConsume = 1.0d0										! neutral values regarding their operation
-ConcMultiProduce = 1.0d0
 SumConsume = 0.0d0
+ConcMultiProduce = 1.0d0										! neutral values regarding their operation
 SumProduce = 0.0d0
 
 ! consuming part of ODE
@@ -242,20 +243,25 @@ DO I = 1, N
 	
 	ConcMultiConsume = 1.0d0									! reset product term for next loop
 END DO
-WRITE(*, *) "SumConsume is", SumConsume
-
 
 ! producing part of ODE
 DO I = 1, N
 	DO lambda = 1, Omega
 		ConcMultiProduce = ( ConcVec(lambda) ** ProdMat(I,lambda) ) * ConcMultiProduce		! calculating the product term of producing part of the ODE
 	END DO
-	SumProduce = RateVec(I) * ProdMat(I,lambda) * ConcMultiProduce + SumProduce			! calculating the sum term (over products) of the producing part of the ODE
+	SumProduce = RateVec(I) * ProdMat(I,SubsNum) * ConcMultiProduce + SumProduce			! calculating the sum term (over products) of the producing part of the ODE
 
 	ConcMultiProduce = 1.0d0
 END DO
-WRITE(*, *) "SumProduce is", SumProduce
 
-DiffEquation = - SumConsume + SumProduce
+
+SC = SumConsume
+SP = SumProduce
+WRITE(*, *) "SC is", SC
+WRITE(*, *) "SP is", SP
+
+DiffEquation = SP - SC
+
+WRITE(*, *) SP - SC
 
 END FUNCTION DiffEquation
