@@ -16,8 +16,10 @@
 !
 ! lambda        --> serial number of iterators over substances [1 ... Omega]
 !
-! IntConcMat    --> Omega x 2 matrix. column 1 contains old concentration of substance 
-!               Lambda in row Lambda and column 2 new concentration of Lambda in Row Lambda
+! ODEVec	--> vector storing the current values of the right hand side ODE
+!
+! ConcMat	--> matrix storing old and new values of the concentration of the substances
+!		Omega x 2 matrix, columnt 1 old concentration, column 2 new concentration
 !
 ! SubsNum       --> number of substance to calculate differential equation from. 
 !               also from [1 ... Omega]
@@ -40,7 +42,8 @@
 INTEGER, DIMENSION(:,:), INTENT(IN) :: EdMat, ProdMat
 INTEGER :: Omega, N, I, lambda, SubsNum, NSteps, IntStep
 
-REAL*8, DIMENSION(:,:), ALLOCATABLE :: IntConcMat
+REAL*8, DIMENSION(:,:), ALLOCATABLE :: ConcMat
+REAL*8, DIMENSION(:), ALLOCATABLE :: ODEVec
 REAL*8, DIMENSION(:), INTENT(IN) :: RateVec , ConcVec
 REAL*8 :: dtime, finaltime
 REAL*8, PARAMETER :: starttime = 0.0d0

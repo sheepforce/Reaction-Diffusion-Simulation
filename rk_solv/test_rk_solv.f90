@@ -6,7 +6,7 @@ IMPLICIT NONE
 INTEGER, DIMENSION(2,4) :: EdMat, ProdMat
 REAL*8, DIMENSION(4) :: ConcVec
 REAL*8, DIMENSION(2) :: RateVec
-REAL*8 :: dtime = 0.5d0, finaltime=1.0d3
+REAL*8 :: dtime = 1.0d-2, finaltime=1.0d3
 INTEGER :: method = 1, NUMTHREAD = 4, i
 
 INTERFACE
