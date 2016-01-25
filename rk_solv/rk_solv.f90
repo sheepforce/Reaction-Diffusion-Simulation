@@ -118,18 +118,22 @@ END DO
 DO IntStep = 1, NSteps
 	! calculate finite, new concentration with "cold concentration" + "rate of concentration change" * "time step"
 	!$OMP PARALLEL NUM_THREADS(NUMTHREAD)
+	!$OMP DO
 	DO lambda = 1, Omega
 		IF (method == 1) THEN										! Euler Method
 			ConcMat(lambda,2) = ConcMat(lambda,1) + ODEVec(lambda) * dtime
 		END IF
 	END DO
+	!$OMP END DO
 	!$OMP END PARALLEL
 	
 	! calculate new values of the ODEs with new concentrations
 	!$OMP PARALLEL NUM_THREADS(NUMTHREAD)
+	!$OMP DO
 	DO lambda = 1, Omega
 		ODEVec(lambda) = RHS_ODE(EdMat, ProdMat, RateVec, ConcMat(:,2), lambda)
 	END DO
+	!$OMP END DO
 	!$OMP END PARALLEL
 
 	! Write the output for this integration step
@@ -138,16 +142,15 @@ DO IntStep = 1, NSteps
 		WRITE(UNIT=100, FMT='(D16.8, A4, $)') ConcMat(lambda,2), "    "
 	END DO
 	WRITE(UNIT=100, FMT='(A1)') " "
-!	WRITE(UNIT=100, FMT='(D16.8, A4, $)') ( ConcMat(lambda,2), "    ", lambda = 1, Omega )
-!	WRITE(UNIT=100, FMT='(D12.4, 4X)') IntStep * dtime, (ConcMat(lambda,2), lambda = 1, Omega)		! Writing the time in the first column
-!	WRITE(UNIT=100, FMT='(D12.4, 4X)') (ConcMat(lambda,2), lambda = 1, Omega)				! Write the concentrations of substance N in column N+1
 
 
 	! new concentration becomes old concentration
 	!$OMP PARALLEL NUM_THREADS(NUMTHREAD)
+	!$OMP DO
 	DO lambda = 1, Omega
 		ConcMat(lambda,1) = ConcMat(lambda,2)
 	END DO
+	!$OMP END DO
 	!$OMP END PARALLEL
 END DO
  
