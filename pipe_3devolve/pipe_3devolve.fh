@@ -1,0 +1,62 @@
+!*EdMat         --> 2-dimensional array containing stoichiometric coefficients of the
+!               educts. first index are reactions, second substances
+!
+!*ProdMat       --> 2-dimensional array containing stoichiometric coefficients of the
+!               products. first index are reactions, second substances
+!
+!*RateVec       --> 1-dimensional array containing rate coefficients for every reaction
+!
+! Omega         --> number of substances, width of matrices EdMat, ProdMat and vector ConcVec
+!
+! N             --> number of reactions, height of matrices EdMat, ProdMat and vector RateVec
+!
+! I             --> serial number of iterators over reactions [1 ... N]
+!
+! lambda        --> serial number of iterators over substances [1 ... Omega]
+!
+! SubsNum       --> number of substance to calculate differential equation from.
+!               also from [1 ... Omega]
+!
+! StartTime     --> time at which to start the integration step
+!
+!*dTime         --> integration step length
+!
+!*Finaltime     --> time at which to stop integration
+!
+! NSteps        --> number of integration steps
+!
+! IntStep       --> serial number of integration [1 ... NSteps]
+!
+!*PipeLength	--> length of the pipe z = [0 ... l]
+!
+!*PipeRadius	--> radius of the pipe x = [-r, ... , 0 , ... , +r] and y = [-r, ... , 0 , ... , +r]
+!
+!*NGridXY	--> Number of points in x and y direction or in how many segments to split the radius
+!
+!*StartConc	--> Array of type (2*NGridXY+1:2*NGridXY+1:INT(Pipelength/Piperadius/NGridXY):Omega)
+!
+!*vmax		--> maximum speed of flow in the middle of the pipe (laminar flow)
+!
+!*vadd		--> constant to be added to the flow at every point
+!
+! NProc		--> number of available MPI procs
+!
+! ProcID	--> current MPI process ID
+!
+! IProc		--> serial number for iterating over MPI processes
+!
+! PointX/Y/Z	--> integer describing position on grid
+!
+! PipeArea	--> 2D Array in xy plane, containing logical values, telling you if you are inside or outside the pipe
+
+INTEGER, DIMENSION(:,:), INTENT(IN) :: EdMat, ProdMat
+INTEGER, INTENT(IN) :: NGridXY
+REAL*8, DIMENSION(:,:,:,:), INTENT(IN) :: StartConc
+REAL*8, DIMENSION(:), INTENT(IN) :: RateVec
+REAL*8, INTEN(IN) :: dTime, FinalTime, PipeLength, PipeRadius, vmax, vadd
+
+INTEGER :: Omega, N, I, lambda, SubsNum, NSteps, IntStep, PointX, PointY, PointZ
+INTEGER :: NProcs, ProcID, IProc
+
+REAL*8, PARAMETER :: StartTime = 0.0d0
+
