@@ -1,71 +1,131 @@
 PROGRAM TEST_PIPE_3DEVOLVE
 IMPLICIT NONE
-INTEGER :: NGridXY, PointX, PointY
-REAL*8 :: vmax, vadd, PipeRadius, FLOW_PROFILE
-REAL*8, DIMENSION(:,:), ALLOCATABLE :: FlowMatrix
-LOGICAL, DIMENSION(:,:), ALLOCATABLE :: PipeArea
+
+REAL*8 :: PipeLength, PipeRadius, vmax, vadd, dTime, FinalTime
+REAL*8, DIMENSION(2) :: RateVec
+REAL*8, DIMENSION(:,:,:,:,:), ALLOCATABLE :: PipeConc
+INTEGER :: NGridXY, method, NGridZ, Omega, N, lambda, I, PointX, PointY, PointZ
+INTEGER, DIMENSION(2,4) :: EdMat, ProdMat
+LOGICAL :: Inflow = .TRUE.
 
 
 INTERFACE
-	SUBROUTINE FIND_PIPE(vmax, NGridXY, PipeArea)
-		IMPLICIT NONE
-		REAL*8, INTENT(IN) ::  vmax
-		INTEGER, INTENT(IN) :: NGridXY
-		REAL*8, PARAMETER :: vadd = 0.0d0
-		LOGICAL, DIMENSION(-NGridXY:+NGridXY,-NGridXY:NGridXY), INTENT(OUT) :: PipeArea
-		INTEGER :: PointX, PointY
-		REAL*8 :: PipeTest, FLOW_PROFILE
+	SUBROUTINE PIPE_3DEVOLVE(PipeLength, PipeRadius, NGridXY, vmax, vadd, dTime, &
+	FinalTime, EdMat, ProdMat, RateVec, PipeConc, method, Inflow)
+		USE mpi
+
+		INCLUDE 'pipe_3devolve.fh'
+
+		INTEGER :: ierr, NProcs, ProcID, IProc, GenericTag = 1		
 	END SUBROUTINE
 END INTERFACE
+
+WRITE(*, *) "================================="
+WRITE(*, *) "|| Here is TEST_PIPE_3D_EVOLVE ||"
+WRITE(*, *) "================================="
+WRITE(*, *)
+WRITE(*, *) "Initializing variables now"
 
 NGridXY = 5
 vmax = 1.0d0
 vadd = 0.0d0
+PipeLength = 2.0d0
+PipeRadius = 5.0d0
+dTime = 0.1d0
+FinalTime = 1.0d3
+method = 1
 
-ALLOCATE(FlowMatrix(-NGridXY:+NgridXY,-NGridXY:+NGridXY))
+NGridZ = NINT(PipeLength / (PipeRadius / NGridXY))
 
+RateVec(1) = 0.005d0
+RateVec(2) = 0.01d0
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!
-!! TESTING FLOW_PROFILE !!
-!!!!!!!!!!!!!!!!!!!!!!!!!!
+EdMat(1,1) = 1
+EdMat(1,2) = 1
+EdMat(1,3) = 0
+EdMat(1,4) = 0
+EdMat(2,1) = 0
+EdMat(2,2) = 0
+EdMat(2,3) = 1
+EdMat(2,4) = 1
 
-WRITE(*, *) "Testing function FLOW_PROFILE now"
-DO PointX = -NgridXY, +NGridXY
-	DO PointY = -NgridXY, +NGridXY
-		WRITE(*, *) "Now on point", PointX, PointY
-		FlowMatrix(PointX,PointY) = FLOW_PROFILE(PointX, PointY, vmax, vadd, NGridXY)
+ProdMat(1,1) = 0
+ProdMat(1,2) = 0
+ProdMat(1,3) = 1
+ProdMat(1,4) = 1
+ProdMat(2,1) = 1
+ProdMat(2,2) = 1
+ProdMat(2,3) = 0
+ProdMat(2,4) = 0
+
+Omega = SIZE(EdMat,2)
+N = SIZE(RateVec)
+
+ALLOCATE(PipeConc(-NGridXY:+NGridXY,-NGridXY:+NGridXY,NGridZ,Omega,2))
+
+PipeConc(:,:,:,:,2) = 0.0d0							! no time step has been taken yet, so this is 0
+PipeConc(:,:,1,1,1) = 10.0d0							! c(A) in the whole XY plane at first grid point in z
+PipeConc(:,:,1,2,1) = 4.0d0							! c(B)
+PipeConc(:,:,1,3,1) = 2.0d0							! c(C)
+PipeConc(:,:,1,4,1) = 0.2d0							! c(C)
+PipeConc(:,:,2:,:,1) = 0.0d0							! concentration of all substances from first xy plane away are 0
+
+WRITE(*, *)
+WRITE(*, *) "Here are the start conditions"
+WRITE(*, *) "NGridXY = ", NGridXY
+WRITE(*, *) "vmax = ", vmax
+WRITE(*, *) "vadd = ", vadd
+WRITE(*, *) "PipeLength = ", PipeLength
+WRITE(*, *) "PipeRadius = ", PipeRadius
+WRITE(*, *) "dTime = ", dTime
+WRITE(*, *) "FinalTime = ", FinalTime
+WRITE(*, *) "method = ", method
+WRITE(*, *) "NGridXY = ", NGridXY
+WRITE(*, *) "NgridZ = ", NGridZ
+WRITE(*, *)
+WRITE(*, *)
+WRITE(*, *)
+WRITE(*, *) "EdMat"
+DO i = 1, 2
+        WRITE(*, *) "        ", EdMat(i,:)
+END DO
+WRITE(*, *)
+WRITE(*, *)
+WRITE(*, *) "ProdMat"
+DO i = 1, 2
+        WRITE(*, *) "        ", ProdMat(i,:)
+END DO
+WRITE(*, *)
+WRITE(*, *)
+WRITE(*, *) "RateVec"
+DO i = 1, 2
+        WRITE(*, *) "        ", RateVec(i)
+END DO
+WRITE(*, *)
+WRITE(*, *)
+WRITE(*, *) "PipeConc"
+WRITE(*, *) "    in xy plane at pipe start (PointZ = 0)"
+DO lambda = 1, Omega
+	WRITE(*, *) "    Substance", lambda
+	DO PointX = -NgridXY, NGridXY
+	WRITE(*, *) "    ", PipeConc(PointX,-NGridXY:,1,lambda,1)
 	END DO
+	WRITE(*, *)
 END DO
-
-WRITE(*, *) "Here is the FlowMatrix"
+WRITE(*, *) "    in xy plane at the pipe end (PointZ = NGridZ)"
+DO lambda = 1, Omega
+        WRITE(*, *) "    Substance", lambda
+        DO PointX = -NgridXY, NGridXY
+        WRITE(*, *) "    ", PipeConc(PointX,-NGridXY:,NGridZ,lambda,1)
+        END DO
+        WRITE(*, *)
+END DO
 WRITE(*, *)
-DO PointX = -NgridXY, NGridXY
-	WRITE(*, *) FlowMatrix(PointX,-NgridXY:)
-END DO
+WRITE(* ,*) "*********************************"
+WRITE(*, *) "*** now calling PIPE_3DEVOLVE ***"
+WRITE(*, *) "*********************************"
 
-!!!!!!!!!!!!!!!!!!!!!!
-!! TESING FIND_PIPE !!
-!!!!!!!!!!!!!!!!!!!!!!
+CALL PIPE_3DEVOLVE(PipeLength, PipeRadius, NGridXY, vmax, vadd, dTime, &
+FinalTime, EdMat, ProdMat, RateVec, PipeConc, method, Inflow)
 
-WRITE(*, *)
-WRITE(*, *)
-WRITE(*, *) "Testing subroutine FIND_PIPE now"
-
-ALLOCATE(PipeArea(-NGridXY:+NGridXY,-NGridXY:+NGridXY))
-
-WRITE(*, *) "look at PipeArea, should be random now"
-
-DO PointX = -NGridXY, +NGridXY
-	WRITE(*, *) "Row", PointX, ":", PipeArea(PointX,-NgridXY:)
-END DO
-
-WRITE(*, *) "Calling FIND_PIPE now, PipeArea should become meaningfull"
-CALL FIND_PIPE(vmax, NGridXY, PipeArea)
-
-WRITE(*, *) "Here is PipeArea as retourned by FIND_PIPE"
-DO PointX = -NgridXY, NGridXY
-	WRITE(*, *) PipeArea(PointX,-NGridXY:) 
-END DO
-
-DEALLOCATE(PipeArea)
 END PROGRAM

@@ -33,30 +33,31 @@
 !
 !*NGridXY	--> Number of points in x and y direction or in how many segments to split the radius
 !
-!*StartConc	--> Array of type (2*NGridXY+1:2*NGridXY+1:INT(Pipelength/Piperadius/NGridXY):Omega)
+! NgridZ	--> Number of points in z direction, calculated from PipeRadius, PipeLength and NGridXY
+!
+!*PipeConc	--> Array of type (2*NGridXY+1:2*NGridXY+1:INT(Pipelength/Piperadius/NGridXY):Omega:2)
 !
 !*vmax		--> maximum speed of flow in the middle of the pipe (laminar flow)
 !
 !*vadd		--> constant to be added to the flow at every point
 !
-! NProc		--> number of available MPI procs
-!
-! ProcID	--> current MPI process ID
-!
-! IProc		--> serial number for iterating over MPI processes
-!
 ! PointX/Y/Z	--> integer describing position on grid
 !
 ! PipeArea	--> 2D Array in xy plane, containing logical values, telling you if you are inside or outside the pipe
+!
+!*method	--> numerical integration method
+!
+!*Inflow	--> is the concentration in the first xy plane constant == is there inflow of educts
+!
 
 INTEGER, DIMENSION(:,:), INTENT(IN) :: EdMat, ProdMat
-INTEGER, INTENT(IN) :: NGridXY
-REAL*8, DIMENSION(:,:,:,:), INTENT(IN) :: StartConc
+INTEGER, INTENT(IN) :: NGridXY, method
+REAL*8, DIMENSION(:,:,:,:,:), INTENT(IN) :: PipeConc
 REAL*8, DIMENSION(:), INTENT(IN) :: RateVec
-REAL*8, INTEN(IN) :: dTime, FinalTime, PipeLength, PipeRadius, vmax, vadd
+REAL*8, INTENT(IN) :: dTime, FinalTime, PipeLength, PipeRadius, vmax, vadd
+LOGICAL, INTENT(IN) :: InFlow
 
-INTEGER :: Omega, N, I, lambda, SubsNum, NSteps, IntStep, PointX, PointY, PointZ
-INTEGER :: NProcs, ProcID, IProc
+INTEGER :: Omega, N, I, lambda, SubsNum, NSteps, NGridZ, IntStep, PointX, PointY, PointZ
 
 REAL*8, PARAMETER :: StartTime = 0.0d0
 
