@@ -10,13 +10,14 @@ LOGICAL :: Inflow = .TRUE.
 
 
 INTERFACE
-	SUBROUTINE PIPE_3DEVOLVE(PipeLength, PipeRadius, NGridXY, vmax, vadd, dTime, &
+	SUBROUTINE PIPE_3DEVOLVE(PipeLength, PipeRadius, NGridXY, NGridZ, vmax, vadd, dTime, &
 	FinalTime, EdMat, ProdMat, RateVec, PipeConc, method, Inflow)
 		USE mpi
 
 		INCLUDE 'pipe_3devolve.fh'
 
 		INTEGER :: ierr, NProcs, ProcID, IProc, GenericTag = 1		
+		LOGICAL, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY) ::  PipeArea
 	END SUBROUTINE
 END INTERFACE
 
@@ -125,7 +126,7 @@ WRITE(* ,*) "*********************************"
 WRITE(*, *) "*** now calling PIPE_3DEVOLVE ***"
 WRITE(*, *) "*********************************"
 
-CALL PIPE_3DEVOLVE(PipeLength, PipeRadius, NGridXY, vmax, vadd, dTime, &
+CALL PIPE_3DEVOLVE(PipeLength, PipeRadius, NGridXY, NGridZ, vmax, vadd, dTime, &
 FinalTime, EdMat, ProdMat, RateVec, PipeConc, method, Inflow)
 
 END PROGRAM

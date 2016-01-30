@@ -53,7 +53,7 @@
 !
 
 
-SUBROUTINE PIPE_3DEVOLVE(PipeLength, PipeRadius, NGridXY, vmax, vadd, dTime, &
+SUBROUTINE PIPE_3DEVOLVE(PipeLength, PipeRadius, NGridXY, NGridZ, vmax, vadd, dTime, &
 FinalTime, EdMat, ProdMat, RateVec, PipeConc, method, Inflow)
 
 USE mpi
@@ -62,6 +62,7 @@ INCLUDE 'pipe_3devolve.fh'
 
 
 INTEGER :: ierr, NProcs, ProcID, IProc, GenericTag = 1
+LOGICAL, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY) ::  PipeArea
 
 INTERFACE
         SUBROUTINE FIND_PIPE(vmax, NGridXY, PipeArea)
@@ -89,11 +90,11 @@ WRITE(*, *) "============================"
 !!  DEBUG END  !!
 !!=============!!
 
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!
 !! INITIALIZE VARIABLES !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!
 
-NGridZ = SIZE(PipeConc,3)
 Omega = SIZE(PipeConc,4)
 N = SIZE(RateVec)
 NSteps = NINT(FinalTime / dTime)
@@ -107,7 +108,6 @@ END IF
 !!=============!!
 !! DEBUG START !!
 !!=============!!
-
 WRITE(*, *) 
 WRITE(*, *) "Now showing you which parameters i got as input"
 WRITE(*, *)
@@ -178,7 +178,18 @@ END DO
 !! INITIALIZE GRID AND PIPE !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+CALL FIND_PIPE(vmax,NGridXY, PipeArea)
 
+!!=============!!
+!! DEBUG START !!
+!!=============!!
+WRITE(*, *) "Found PipeArea"
+DO PointX = -NGridXY, +NGridXY
+	WRITE(*, *) PipeArea(PointX,-NGridXY:)
+END DO
+!!=============!!
+!!  DEBUG END  !!
+!!=============!!
 
 
 CALL MPI_FINALIZE(ierr)

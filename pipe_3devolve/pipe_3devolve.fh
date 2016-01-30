@@ -33,7 +33,7 @@
 !
 !*NGridXY	--> Number of points in x and y direction or in how many segments to split the radius
 !
-! NgridZ	--> Number of points in z direction, calculated from PipeRadius, PipeLength and NGridXY
+!*NgridZ	--> Number of points in z direction, calculated from PipeRadius, PipeLength and NGridXY
 !
 !*PipeConc	--> Array of type (2*NGridXY+1:2*NGridXY+1:INT(Pipelength/Piperadius/NGridXY):Omega:2)
 !
@@ -51,13 +51,13 @@
 !
 
 INTEGER, DIMENSION(:,:), INTENT(IN) :: EdMat, ProdMat
-INTEGER, INTENT(IN) :: NGridXY, method
-REAL*8, DIMENSION(:,:,:,:,:), INTENT(IN) :: PipeConc
+INTEGER, INTENT(IN) :: NGridXY, NgridZ, method
+REAL*8, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY,1:NGridZ,1:SIZE(EdMat,2),1:2), INTENT(IN) :: PipeConc
 REAL*8, DIMENSION(:), INTENT(IN) :: RateVec
 REAL*8, INTENT(IN) :: dTime, FinalTime, PipeLength, PipeRadius, vmax, vadd
 LOGICAL, INTENT(IN) :: InFlow
 
-INTEGER :: Omega, N, I, lambda, SubsNum, NSteps, NGridZ, IntStep, PointX, PointY, PointZ
+INTEGER :: Omega, N, I, lambda, SubsNum, NSteps, IntStep, PointX, PointY, PointZ
 
 REAL*8, PARAMETER :: StartTime = 0.0d0
 
