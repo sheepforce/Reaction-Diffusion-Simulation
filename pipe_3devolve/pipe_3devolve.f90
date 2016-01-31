@@ -60,7 +60,7 @@ USE mpi
 
 INCLUDE 'pipe_3devolve.fh'
 
-INTEGER :: ierr, NProcs, ProcID, IProc, GenericTag = 1
+INTEGER :: ierr, NProcs, ProcID, IProc, GenericTag = 1, BCastSendCount
 
 INTERFACE
         SUBROUTINE FIND_PIPE(vmax, NGridXY, PipeArea)
@@ -75,7 +75,9 @@ INTERFACE
 END INTERFACE
 
 
-CALL MPI_INIT(ierr)
+CALL MPI_INIT(ierr)											! fork the processes with MPI
+CALL MPI_COMM_RANK(MPI_COMM_WORLD, ProcID, ierr)							! get the ID of the current process
+CALL MPI_COMM_SIZE(MPI_COMM_WORLD, NProcs, ierr)							! how many MPI processes are there over all
 
 !!=============!!
 !! DEBUG START !!
@@ -104,73 +106,6 @@ IF (method < 1 .OR. method > 1) THEN
         RETURN
 END IF
 
-!!=============!!
-!! DEBUG START !!
-!!=============!!
-!WRITE(*, *) 
-!WRITE(*, *) "Now showing you which parameters i got as input"
-!WRITE(*, *)
-!WRITE(*, *)
-!WRITE(*, *) "Here are the start conditions"
-!WRITE(*, *) "NGridXY = ", NGridXY
-!WRITE(*, *) "vmax = ", vmax
-!WRITE(*, *) "vadd = ", vadd
-!WRITE(*, *) "PipeLength = ", PipeLength
-!WRITE(*, *) "PipeRadius = ", PipeRadius
-!WRITE(*, *) "dTime = ", dTime
-!WRITE(*, *) "FinalTime = ", FinalTime
-!WRITE(*, *) "method = ", method
-!WRITE(*, *) "NGridXY = ", NGridXY
-!WRITE(*, *) "NgridZ = ", NGridZ
-!WRITE(*, *) "Omega = ", Omega
-!WRITE(*, *) "N = ", N
-!WRITE(*, *)
-!WRITE(*, *)
-!WRITE(*, *) "EdMat"
-!DO i = 1, 2
-!        WRITE(*, *) "        ", EdMat(i,:)
-!END DO
-!WRITE(*, *)
-!WRITE(*, *)
-!WRITE(*, *) "ProdMat"
-!DO i = 1, 2
-!        WRITE(*, *) "        ", ProdMat(i,:)
-!END DO
-!WRITE(*, *)
-!WRITE(*, *)
-!WRITE(*, *) "RateVec"
-!DO i = 1, 2
-!        WRITE(*, *) "        ", RateVec(i)
-!END DO
-!WRITE(*, *)
-!WRITE(*, *)
-!WRITE(*, *) "PipeConc"
-!WRITE(*, *) "    Size in x", SIZE(PipeConc,1)
-!WRITE(*, *) "    Size in y", SIZE(PipeConc,2)
-!WRITE(*, *) "    Size in z", SIZE(PipeConc,3)
-!WRITE(*, *) "    Size in Substances", SIZE(PipeConc,4)
-!WRITE(*, *) "    Size in time", SIZE(PipeConc,5)
-
-!WRITE(*, *) "    in xy plane at pipe start (PointZ = 0)"
-!DO lambda = 1, Omega
-!        WRITE(*, *) "    Substance", lambda
-!        DO PointX = -NgridXY, NGridXY
-!        WRITE(*, *) "    ", PipeConc(PointX,-NGridXY:,1,lambda,1)
-!        END DO
-!        WRITE(*, *)
-!END DO
-!WRITE(*, *) "    in xy plane at the pipe end (PointZ = NGridZ)"
-!DO lambda = 1, Omega
-!        WRITE(*, *) "    Substance", lambda
-!        DO PointX = -NgridXY, NGridXY
-!        WRITE(*, *) "    ", PipeConc(PointX,-NGridXY:,NGridZ,lambda,1)
-!        END DO
-!        WRITE(*, *)
-!END DO
-!!=============!!
-!!  DEBUG END  !!
-!!=============!!
-
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! INITIALIZE GRID AND PIPE !!
@@ -178,16 +113,6 @@ END IF
 
 CALL FIND_PIPE(vmax,NGridXY, PipeArea)									! find the grid points inside the pipe and outside the pipe
 
-!!=============!!
-!! DEBUG START !!
-!!=============!!
-!WRITE(*, *) "Found PipeArea"
-!DO PointX = -NGridXY, +NGridXY
-!	WRITE(*, *) PipeArea(PointX,-NGridXY:)
-!END DO
-!!=============!!
-!!  DEBUG END  !!
-!!=============!!
 
 FlowMat = 0.0d0
 
@@ -199,16 +124,48 @@ DO PointX = -NgridXY, NGridXY
 	END DO
 END DO
 
-!!=============!!
-!! DEBUG START !!
-!!=============!!
-!WRITE(*, *) "Found FlowMat"
-!DO PointX = -NGridXY, +NGridXY
-!        WRITE(*, *) FlowMat(PointX,-NGridXY:)
-!END DO
-!!=============!!
-!!  DEBUG END  !!
-!!=============!!
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! INTEGRATION OVER TIME !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! distribute PipeConc(:,:,:,:,1) to all MPI threads, number of elements to send
+BCastSendCount = SIZE(PipeConc) / 2
+
+! MPI threads > 0 calculate the end of the pipe in z direction 
+ZGridElementsMPI = NgridZ / NProcs
+
+DO IntStep = 1, NSteps											! Integrate over time
+	CALL MPI_BCAST(PipeConc, BCastSendCount, MPI_DOUBLE_PRECISION, 0, MPI_COMM_WORLD, ierr)		! distribute the new start concentrations to all threads
+	
+	DO PointX = -NgridXY, +NGridXY									! iterate over points in X
+	DO PointY = -NGridXY, +NgridXY									! iterate over points in Y
+	DO PointZ = (ZGridElementsMPI * ProcID) + 1, ZGridElementsMPI * (ProcID + 1)			! iterate over points in Z
+		!!=============!!
+		!! DEBUG START !!
+		!!=============!!
+
+		WRITE(*, *) "Here is MPI Thread", ProcID
+
+		!!=============!!
+		!!  DEBUG END  !!
+		!!=============!!
+		
+		!!!!!!!!!!!!!!!!!!!!!!!
+		!! REACTION KINETICS !!
+		!!!!!!!!!!!!!!!!!!!!!!!
+
+!		CALL RKS_INT(EdMat, ProdMat, RateVec, PipeConc(PointX,PointY,PointZ,:,1), &		! calculates the change in concentrations by reaction 
+!		dTime, method, DeltaConc)								! kinetics and stores them in DeltaConc
+
+
+
+	END DO												! stop iterate over points in Z	
+	END DO												! stop iterate over points in Y
+	END DO												! stop iterate over points in X
+
+
+END DO													! end integrate over time
 
 CALL MPI_FINALIZE(ierr)
 

@@ -53,18 +53,23 @@
 !
 ! FLOW_PROFILE	--> value of function FLOW_PROFILE
 !
+! ZGridElementsMPI --> Number of points in z direction, that an MPI thread uses
+!
+! DeltaConc	--> intermediate vector, storing changes in concentrations after the subintegrations
+!
 
 INTEGER, DIMENSION(:,:), INTENT(IN) :: EdMat, ProdMat
 INTEGER, INTENT(IN) :: NGridXY, NgridZ, method
-REAL*8, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY,1:NGridZ,1:SIZE(EdMat,2),1:2), INTENT(IN) :: PipeConc
+REAL*8, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY,1:NGridZ,1:SIZE(EdMat,2),1:2) :: PipeConc
 REAL*8, DIMENSION(:), INTENT(IN) :: RateVec
 REAL*8, INTENT(IN) :: dTime, FinalTime, PipeLength, PipeRadius, vmax, vadd
 LOGICAL, INTENT(IN) :: InFlow
 
-INTEGER :: Omega, N, I, lambda, SubsNum, NSteps, IntStep, PointX, PointY, PointZ
+INTEGER :: Omega, N, I, lambda, SubsNum, NSteps, IntStep, PointX, PointY, PointZ, ZGridElementsMPI
 
 LOGICAL, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY) :: PipeArea
 REAL*8, DIMENSION(-NgridXY:+NgridXY,-NGridXY:+NGridXY) :: FlowMat
+REAL*8, DIMENSION(1:SIZE(EdMat,2)) :: DeltaConc
 REAL*8 :: FLOW_PROFILE
 
 REAL*8, PARAMETER :: StartTime = 0.0d0
