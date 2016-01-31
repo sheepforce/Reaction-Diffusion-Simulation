@@ -60,9 +60,7 @@ USE mpi
 
 INCLUDE 'pipe_3devolve.fh'
 
-
 INTEGER :: ierr, NProcs, ProcID, IProc, GenericTag = 1
-LOGICAL, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY) ::  PipeArea
 
 INTERFACE
         SUBROUTINE FIND_PIPE(vmax, NGridXY, PipeArea)
@@ -75,6 +73,7 @@ INTERFACE
                 REAL*8 :: PipeTest, FLOW_PROFILE
         END SUBROUTINE
 END INTERFACE
+
 
 CALL MPI_INIT(ierr)
 
@@ -108,67 +107,66 @@ END IF
 !!=============!!
 !! DEBUG START !!
 !!=============!!
-WRITE(*, *) 
-WRITE(*, *) "Now showing you which parameters i got as input"
-WRITE(*, *)
-WRITE(*, *)
-WRITE(*, *) "Here are the start conditions"
-WRITE(*, *) "NGridXY = ", NGridXY
-WRITE(*, *) "vmax = ", vmax
-WRITE(*, *) "vadd = ", vadd
-WRITE(*, *) "PipeLength = ", PipeLength
-WRITE(*, *) "PipeRadius = ", PipeRadius
-WRITE(*, *) "dTime = ", dTime
-WRITE(*, *) "FinalTime = ", FinalTime
-WRITE(*, *) "method = ", method
-WRITE(*, *) "NGridXY = ", NGridXY
-WRITE(*, *) "NgridZ = ", NGridZ
-WRITE(*, *) "Omega = ", Omega
-WRITE(*, *) "N = ", N
-WRITE(*, *)
-WRITE(*, *)
-WRITE(*, *) "EdMat"
-DO i = 1, 2
-        WRITE(*, *) "        ", EdMat(i,:)
-END DO
-WRITE(*, *)
-WRITE(*, *)
-WRITE(*, *) "ProdMat"
-DO i = 1, 2
-        WRITE(*, *) "        ", ProdMat(i,:)
-END DO
-WRITE(*, *)
-WRITE(*, *)
-WRITE(*, *) "RateVec"
-DO i = 1, 2
-        WRITE(*, *) "        ", RateVec(i)
-END DO
-WRITE(*, *)
-WRITE(*, *)
-WRITE(*, *) "PipeConc"
-WRITE(*, *) "    Size in x", SIZE(PipeConc,1)
-WRITE(*, *) "    Size in y", SIZE(PipeConc,2)
-WRITE(*, *) "    Size in z", SIZE(PipeConc,3)
-WRITE(*, *) "    Size in Substances", SIZE(PipeConc,4)
-WRITE(*, *) "    Size in time", SIZE(PipeConc,5)
+!WRITE(*, *) 
+!WRITE(*, *) "Now showing you which parameters i got as input"
+!WRITE(*, *)
+!WRITE(*, *)
+!WRITE(*, *) "Here are the start conditions"
+!WRITE(*, *) "NGridXY = ", NGridXY
+!WRITE(*, *) "vmax = ", vmax
+!WRITE(*, *) "vadd = ", vadd
+!WRITE(*, *) "PipeLength = ", PipeLength
+!WRITE(*, *) "PipeRadius = ", PipeRadius
+!WRITE(*, *) "dTime = ", dTime
+!WRITE(*, *) "FinalTime = ", FinalTime
+!WRITE(*, *) "method = ", method
+!WRITE(*, *) "NGridXY = ", NGridXY
+!WRITE(*, *) "NgridZ = ", NGridZ
+!WRITE(*, *) "Omega = ", Omega
+!WRITE(*, *) "N = ", N
+!WRITE(*, *)
+!WRITE(*, *)
+!WRITE(*, *) "EdMat"
+!DO i = 1, 2
+!        WRITE(*, *) "        ", EdMat(i,:)
+!END DO
+!WRITE(*, *)
+!WRITE(*, *)
+!WRITE(*, *) "ProdMat"
+!DO i = 1, 2
+!        WRITE(*, *) "        ", ProdMat(i,:)
+!END DO
+!WRITE(*, *)
+!WRITE(*, *)
+!WRITE(*, *) "RateVec"
+!DO i = 1, 2
+!        WRITE(*, *) "        ", RateVec(i)
+!END DO
+!WRITE(*, *)
+!WRITE(*, *)
+!WRITE(*, *) "PipeConc"
+!WRITE(*, *) "    Size in x", SIZE(PipeConc,1)
+!WRITE(*, *) "    Size in y", SIZE(PipeConc,2)
+!WRITE(*, *) "    Size in z", SIZE(PipeConc,3)
+!WRITE(*, *) "    Size in Substances", SIZE(PipeConc,4)
+!WRITE(*, *) "    Size in time", SIZE(PipeConc,5)
 
-WRITE(*, *) "    in xy plane at pipe start (PointZ = 0)"
-DO lambda = 1, Omega
-        WRITE(*, *) "    Substance", lambda
-        DO PointX = -NgridXY, NGridXY
-        WRITE(*, *) "    ", PipeConc(PointX,-NGridXY:,1,lambda,1)
-        END DO
-        WRITE(*, *)
-END DO
-WRITE(*, *) "    in xy plane at the pipe end (PointZ = NGridZ)"
-DO lambda = 1, Omega
-        WRITE(*, *) "    Substance", lambda
-        DO PointX = -NgridXY, NGridXY
-        WRITE(*, *) "    ", PipeConc(PointX,-NGridXY:,NGridZ,lambda,1)
-        END DO
-        WRITE(*, *)
-END DO
-
+!WRITE(*, *) "    in xy plane at pipe start (PointZ = 0)"
+!DO lambda = 1, Omega
+!        WRITE(*, *) "    Substance", lambda
+!        DO PointX = -NgridXY, NGridXY
+!        WRITE(*, *) "    ", PipeConc(PointX,-NGridXY:,1,lambda,1)
+!        END DO
+!        WRITE(*, *)
+!END DO
+!WRITE(*, *) "    in xy plane at the pipe end (PointZ = NGridZ)"
+!DO lambda = 1, Omega
+!        WRITE(*, *) "    Substance", lambda
+!        DO PointX = -NgridXY, NGridXY
+!        WRITE(*, *) "    ", PipeConc(PointX,-NGridXY:,NGridZ,lambda,1)
+!        END DO
+!        WRITE(*, *)
+!END DO
 !!=============!!
 !!  DEBUG END  !!
 !!=============!!
@@ -178,19 +176,39 @@ END DO
 !! INITIALIZE GRID AND PIPE !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-CALL FIND_PIPE(vmax,NGridXY, PipeArea)
+CALL FIND_PIPE(vmax,NGridXY, PipeArea)									! find the grid points inside the pipe and outside the pipe
 
 !!=============!!
 !! DEBUG START !!
 !!=============!!
-WRITE(*, *) "Found PipeArea"
-DO PointX = -NGridXY, +NGridXY
-	WRITE(*, *) PipeArea(PointX,-NGridXY:)
-END DO
+!WRITE(*, *) "Found PipeArea"
+!DO PointX = -NGridXY, +NGridXY
+!	WRITE(*, *) PipeArea(PointX,-NGridXY:)
+!END DO
 !!=============!!
 !!  DEBUG END  !!
 !!=============!!
 
+FlowMat = 0.0d0
+
+DO PointX = -NgridXY, NGridXY
+	DO PointY = -NgridXY, NGridXY
+		IF (PipeArea(PointX,PointY) .EQV. .TRUE.) THEN
+			FlowMat(PointX,PointY) = FLOW_PROFILE(PointX, PointY, vmax, vadd, NGridXY)	! calculate flow profile inside the pipe, stored in FlowMat
+		END IF
+	END DO
+END DO
+
+!!=============!!
+!! DEBUG START !!
+!!=============!!
+!WRITE(*, *) "Found FlowMat"
+!DO PointX = -NGridXY, +NGridXY
+!        WRITE(*, *) FlowMat(PointX,-NGridXY:)
+!END DO
+!!=============!!
+!!  DEBUG END  !!
+!!=============!!
 
 CALL MPI_FINALIZE(ierr)
 

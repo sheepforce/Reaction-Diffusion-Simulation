@@ -49,6 +49,10 @@
 !
 !*Inflow	--> is the concentration in the first xy plane constant == is there inflow of educts
 !
+! FlowMat	--> Matrix describing the flow speed in xy plane
+!
+! FLOW_PROFILE	--> value of function FLOW_PROFILE
+!
 
 INTEGER, DIMENSION(:,:), INTENT(IN) :: EdMat, ProdMat
 INTEGER, INTENT(IN) :: NGridXY, NgridZ, method
@@ -58,6 +62,10 @@ REAL*8, INTENT(IN) :: dTime, FinalTime, PipeLength, PipeRadius, vmax, vadd
 LOGICAL, INTENT(IN) :: InFlow
 
 INTEGER :: Omega, N, I, lambda, SubsNum, NSteps, IntStep, PointX, PointY, PointZ
+
+LOGICAL, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY) :: PipeArea
+REAL*8, DIMENSION(-NgridXY:+NgridXY,-NGridXY:+NGridXY) :: FlowMat
+REAL*8 :: FLOW_PROFILE
 
 REAL*8, PARAMETER :: StartTime = 0.0d0
 

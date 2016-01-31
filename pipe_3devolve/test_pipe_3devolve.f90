@@ -17,7 +17,6 @@ INTERFACE
 		INCLUDE 'pipe_3devolve.fh'
 
 		INTEGER :: ierr, NProcs, ProcID, IProc, GenericTag = 1		
-		LOGICAL, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY) ::  PipeArea
 	END SUBROUTINE
 END INTERFACE
 
@@ -71,57 +70,57 @@ PipeConc(:,:,1,3,1) = 2.0d0							! c(C)
 PipeConc(:,:,1,4,1) = 0.2d0							! c(C)
 PipeConc(:,:,2:,:,1) = 0.0d0							! concentration of all substances from first xy plane away are 0
 
-WRITE(*, *)
-WRITE(*, *) "Here are the start conditions"
-WRITE(*, *) "NGridXY = ", NGridXY
-WRITE(*, *) "vmax = ", vmax
-WRITE(*, *) "vadd = ", vadd
-WRITE(*, *) "PipeLength = ", PipeLength
-WRITE(*, *) "PipeRadius = ", PipeRadius
-WRITE(*, *) "dTime = ", dTime
-WRITE(*, *) "FinalTime = ", FinalTime
-WRITE(*, *) "method = ", method
-WRITE(*, *) "NGridXY = ", NGridXY
-WRITE(*, *) "NgridZ = ", NGridZ
-WRITE(*, *)
-WRITE(*, *)
-WRITE(*, *)
-WRITE(*, *) "EdMat"
-DO i = 1, 2
-        WRITE(*, *) "        ", EdMat(i,:)
-END DO
-WRITE(*, *)
-WRITE(*, *)
-WRITE(*, *) "ProdMat"
-DO i = 1, 2
-        WRITE(*, *) "        ", ProdMat(i,:)
-END DO
-WRITE(*, *)
-WRITE(*, *)
-WRITE(*, *) "RateVec"
-DO i = 1, 2
-        WRITE(*, *) "        ", RateVec(i)
-END DO
-WRITE(*, *)
-WRITE(*, *)
-WRITE(*, *) "PipeConc"
-WRITE(*, *) "    in xy plane at pipe start (PointZ = 0)"
-DO lambda = 1, Omega
-	WRITE(*, *) "    Substance", lambda
-	DO PointX = -NgridXY, NGridXY
-	WRITE(*, *) "    ", PipeConc(PointX,-NGridXY:,1,lambda,1)
-	END DO
-	WRITE(*, *)
-END DO
-WRITE(*, *) "    in xy plane at the pipe end (PointZ = NGridZ)"
-DO lambda = 1, Omega
-        WRITE(*, *) "    Substance", lambda
-        DO PointX = -NgridXY, NGridXY
-        WRITE(*, *) "    ", PipeConc(PointX,-NGridXY:,NGridZ,lambda,1)
-        END DO
-        WRITE(*, *)
-END DO
-WRITE(*, *)
+!WRITE(*, *)
+!WRITE(*, *) "Here are the start conditions"
+!WRITE(*, *) "NGridXY = ", NGridXY
+!WRITE(*, *) "vmax = ", vmax
+!WRITE(*, *) "vadd = ", vadd
+!WRITE(*, *) "PipeLength = ", PipeLength
+!WRITE(*, *) "PipeRadius = ", PipeRadius
+!WRITE(*, *) "dTime = ", dTime
+!WRITE(*, *) "FinalTime = ", FinalTime
+!WRITE(*, *) "method = ", method
+!WRITE(*, *) "NGridXY = ", NGridXY
+!WRITE(*, *) "NgridZ = ", NGridZ
+!WRITE(*, *)
+!WRITE(*, *)
+!WRITE(*, *)
+!WRITE(*, *) "EdMat"
+!DO i = 1, 2
+!        WRITE(*, *) "        ", EdMat(i,:)
+!END DO
+!WRITE(*, *)
+!WRITE(*, *)
+!WRITE(*, *) "ProdMat"
+!DO i = 1, 2
+!        WRITE(*, *) "        ", ProdMat(i,:)
+!END DO
+!WRITE(*, *)
+!WRITE(*, *)
+!WRITE(*, *) "RateVec"
+!DO i = 1, 2
+!        WRITE(*, *) "        ", RateVec(i)
+!END DO
+!WRITE(*, *)
+!WRITE(*, *)
+!WRITE(*, *) "PipeConc"
+!WRITE(*, *) "    in xy plane at pipe start (PointZ = 0)"
+!DO lambda = 1, Omega
+!	WRITE(*, *) "    Substance", lambda
+!	DO PointX = -NgridXY, NGridXY
+!	WRITE(*, *) "    ", PipeConc(PointX,-NGridXY:,1,lambda,1)
+!	END DO
+!	WRITE(*, *)
+!END DO
+!WRITE(*, *) "    in xy plane at the pipe end (PointZ = NGridZ)"
+!DO lambda = 1, Omega
+!        WRITE(*, *) "    Substance", lambda
+!        DO PointX = -NgridXY, NGridXY
+!        WRITE(*, *) "    ", PipeConc(PointX,-NGridXY:,NGridZ,lambda,1)
+!        END DO
+!        WRITE(*, *)
+!END DO
+!WRITE(*, *)
 WRITE(* ,*) "*********************************"
 WRITE(*, *) "*** now calling PIPE_3DEVOLVE ***"
 WRITE(*, *) "*********************************"
