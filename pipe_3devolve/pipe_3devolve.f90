@@ -1,4 +1,4 @@
-! Subroutine PIPE_3DEVOLVE will numerical solve the time evolution of 
+#! Subroutine PIPE_3DEVOLVE will numerical solve the time evolution of 
 ! the concentrations of all substances taking reaction kinetics, 
 ! diffusion and flow into account
 !
@@ -74,6 +74,21 @@ INTERFACE
         END SUBROUTINE
 END INTERFACE
 
+INTERFACE
+        SUBROUTINE RKS_INT(EdMat, ProdMat, RateVec, ConcVec, dTime, method, DeltaConc)
+                IMPLICIT NONE
+                INTEGER, DIMENSION(:,:), INTENT(IN) :: EdMat, ProdMat
+                REAL*8, DIMENSION(:), INTENT(IN) :: RateVec , ConcVec
+                REAL*8, INTENT(IN) :: dTime
+                INTEGER, INTENT(IN) :: method
+
+                REAL*8, DIMENSION(:), INTENT(OUT) :: DeltaConc
+
+                INTEGER :: Omega, N, I, lambda, SubsNum
+                REAL*8, DIMENSION(:), ALLOCATABLE :: ODEVec
+                REAL*8 :: RHS_ODE
+        END SUBROUTINE
+END INTERFACE
 
 CALL MPI_INIT(ierr)											! fork the processes with MPI
 CALL MPI_COMM_RANK(MPI_COMM_WORLD, ProcID, ierr)							! get the ID of the current process
@@ -138,26 +153,23 @@ ZGridElementsMPI = NgridZ / NProcs
 DO IntStep = 1, NSteps											! Integrate over time
 	CALL MPI_BCAST(PipeConc, BCastSendCount, MPI_DOUBLE_PRECISION, 0, MPI_COMM_WORLD, ierr)		! distribute the new start concentrations to all threads
 	
+	DeltaConc = 0.0d0										! reset DeltaConc after each integration step
+	PipeConc(:,:,:,:,2) = 0.0d0									! reset PipeConc(:,:,:,:,2) after each integration step
+
 	DO PointX = -NgridXY, +NGridXY									! iterate over points in X
 	DO PointY = -NGridXY, +NgridXY									! iterate over points in Y
 	DO PointZ = (ZGridElementsMPI * ProcID) + 1, ZGridElementsMPI * (ProcID + 1)			! iterate over points in Z
-		!!=============!!
-		!! DEBUG START !!
-		!!=============!!
-
-		WRITE(*, *) "Here is MPI Thread", ProcID
-
-		!!=============!!
-		!!  DEBUG END  !!
-		!!=============!!
 		
 		!!!!!!!!!!!!!!!!!!!!!!!
 		!! REACTION KINETICS !!
 		!!!!!!!!!!!!!!!!!!!!!!!
 
-!		CALL RKS_INT(EdMat, ProdMat, RateVec, PipeConc(PointX,PointY,PointZ,:,1), &		! calculates the change in concentrations by reaction 
-!		dTime, method, DeltaConc)								! kinetics and stores them in DeltaConc
+		CALL RKS_INT(EdMat, ProdMat, RateVec, PipeConc(PointX,PointY,PointZ,:,1), &		! calculates the change in concentrations by reaction 
+		dTime, method, DeltaConc)								! kinetics and stores them in DeltaConc
 
+		DO lambda = 1, Omega
+			PipeConc(PointX,PointY,PointZ,lambda,2) = DeltaConc(lambda)			! store concentration changes due to reaction kinetics in PipeConc, Layer 2
+		END DO
 
 
 	END DO												! stop iterate over points in Z	
