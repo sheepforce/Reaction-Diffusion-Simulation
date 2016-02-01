@@ -91,4 +91,6 @@ DO lambda = 1, Omega
 	DeltaConc(lambda) = ODEVec(lambda) * dtime
 END DO
 
+DEALLOCATE(ODEVec)
+
 END SUBROUTINE
