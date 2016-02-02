@@ -164,9 +164,6 @@ END DO
 ! distribute PipeConc(:,:,:,:,1) to all MPI threads, number of elements to send
 BCastSendCount = SIZE(PipeConc) / 2
 
-! MPI threads > 0 calculate the end of the pipe in z direction 
-ZGridElementsMPI = NgridZ / NProcs
-
 DO IntStep = 1, NSteps											! Integrate over time
 	CALL MPI_BCAST(PipeConc, BCastSendCount, MPI_DOUBLE_PRECISION, 0, MPI_COMM_WORLD, ierr)		! distribute the new start concentrations to all threads
 	
@@ -175,7 +172,7 @@ DO IntStep = 1, NSteps											! Integrate over time
 
 	DO PointX = -NgridXY, +NGridXY									! iterate over points in X
 	DO PointY = -NGridXY, +NgridXY									! iterate over points in Y
-	DO PointZ = (ZGridElementsMPI * ProcID) + 1, ZGridElementsMPI * (ProcID + 1)			! iterate over points in Z
+	DO PointZ = ProcID + 1, NGridZ, NProcs								! iterate over points in Z, distributed with MPI
 
 		! if we are not in the pipe area at the current point we do not need to solve nothing...
 		IF (PipeArea(PointX,PointY) .EQV. .FALSE.) THEN
@@ -204,7 +201,7 @@ DO IntStep = 1, NSteps											! Integrate over time
 
 		IF (PointZ == 1) THEN
 			DummyFlowInMat(1,:) = 0.0d0							! the concentrations before the pipe starts are 0, so that there can be no inflow
-			DummyFlowInMat(1,:) = PipeConc(PointX,PointY,PointZ,:,1)			! the concentrations at the start of the pipe are the choes concentrations of the pipe...
+			DummyFlowInMat(2,:) = PipeConc(PointX,PointY,PointZ,:,1)			! the concentrations at the start of the pipe are the chosen concentrations of the pipe...
 			
 			CALL FLOW_INT(PipeLength, NGridZ, FlowMat(PointX,PointY), &			! calculates the change in concentration by laminar flow
 			DummyFlowInMat, dTime, DeltaConc)						! using the current point and the previous point in z direction

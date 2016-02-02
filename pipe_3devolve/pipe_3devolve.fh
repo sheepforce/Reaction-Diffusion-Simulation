@@ -68,7 +68,7 @@ REAL*8, INTENT(IN) :: dTime, FinalTime, PipeLength, PipeRadius, vmax, vadd
 LOGICAL, INTENT(IN) :: InFlow
 REAL*8, DIMENSION(2,SIZE(EdMat,2)) :: DummyFlowInMat
 
-INTEGER :: Omega, N, I, lambda, SubsNum, NSteps, IntStep, PointX, PointY, PointZ, ZGridElementsMPI
+INTEGER :: Omega, N, I, lambda, SubsNum, NSteps, IntStep, PointX, PointY, PointZ
 
 LOGICAL, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY) :: PipeArea
 REAL*8, DIMENSION(-NgridXY:+NgridXY,-NGridXY:+NGridXY) :: FlowMat
