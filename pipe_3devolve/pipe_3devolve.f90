@@ -92,6 +92,21 @@ INTERFACE
         END SUBROUTINE
 END INTERFACE
 
+INTERFACE
+	SUBROUTINE FLOW_INT(PipeLength, NGridZ, vFlowXY, FlowConcMat, dTime, DeltaConc)
+
+		IMPLICIT NONE
+		REAL*8, INTENT(IN) :: PipeLength, vFlowXY, dtime
+		REAL*8, DIMENSION(:,:), INTENT(IN) :: FlowConcMat
+		INTEGER, INTENT(IN) :: NGridZ
+
+		REAL*8, DIMENSION(SIZE(FlowConcMat,2)), INTENT(OUT) :: DeltaConc
+
+		REAL*8 :: DeltaL, DeltaN
+		INTEGER :: Omega, I, lambda
+	END SUBROUTINE
+END INTERFACE
+
 CALL MPI_INIT(ierr)											! fork the processes with MPI
 CALL MPI_COMM_RANK(MPI_COMM_WORLD, ProcID, ierr)							! get the ID of the current process
 CALL MPI_COMM_SIZE(MPI_COMM_WORLD, NProcs, ierr)							! how many MPI processes are there over all
