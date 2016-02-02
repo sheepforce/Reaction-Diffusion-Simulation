@@ -31,7 +31,7 @@ vmax = 1.0d0
 vadd = 0.0d0
 PipeLength = 2.0d0
 PipeRadius = 5.0d0
-dTime = 0.1d0
+dTime = 0.1d-1
 FinalTime = 1.0d3
 method = 1
 

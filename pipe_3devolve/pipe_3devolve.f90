@@ -1,4 +1,4 @@
-#! Subroutine PIPE_3DEVOLVE will numerical solve the time evolution of 
+! Subroutine PIPE_3DEVOLVE will numerical solve the time evolution of 
 ! the concentrations of all substances taking reaction kinetics, 
 ! diffusion and flow into account
 !
@@ -58,6 +58,8 @@ FinalTime, EdMat, ProdMat, RateVec, PipeConc, method, Inflow)
 
 USE mpi
 
+IMPLICIT NONE
+
 INCLUDE 'pipe_3devolve.fh'
 
 INTEGER :: ierr, NProcs, ProcID, IProc, GenericTag = 1, BCastSendCount
@@ -82,7 +84,7 @@ INTERFACE
                 REAL*8, INTENT(IN) :: dTime
                 INTEGER, INTENT(IN) :: method
 
-                REAL*8, DIMENSION(:), INTENT(OUT) :: DeltaConc
+		REAL*8, DIMENSION(1:SIZE(ConcVec)), INTENT(OUT) :: DeltaConc
 
                 INTEGER :: Omega, N, I, lambda, SubsNum
                 REAL*8, DIMENSION(:), ALLOCATABLE :: ODEVec
@@ -159,7 +161,13 @@ DO IntStep = 1, NSteps											! Integrate over time
 	DO PointX = -NgridXY, +NGridXY									! iterate over points in X
 	DO PointY = -NGridXY, +NgridXY									! iterate over points in Y
 	DO PointZ = (ZGridElementsMPI * ProcID) + 1, ZGridElementsMPI * (ProcID + 1)			! iterate over points in Z
-		
+
+		! if we are not in the pipe area at the current point we do not need to solve nothing...
+		IF (PipeArea(PointX,PointY) .EQV. .FALSE.) THEN
+			EXIT
+		END IF		
+
+
 		!!!!!!!!!!!!!!!!!!!!!!!
 		!! REACTION KINETICS !!
 		!!!!!!!!!!!!!!!!!!!!!!!
@@ -168,9 +176,39 @@ DO IntStep = 1, NSteps											! Integrate over time
 		dTime, method, DeltaConc)								! kinetics and stores them in DeltaConc
 
 		DO lambda = 1, Omega
-			PipeConc(PointX,PointY,PointZ,lambda,2) = DeltaConc(lambda)			! store concentration changes due to reaction kinetics in PipeConc, Layer 2
+			PipeConc(PointX,PointY,PointZ,lambda,2) = DeltaConc(lambda) &
+			+ PipeConc(PointX,PointY,PointZ,lambda,2)					! store concentration changes due to reaction kinetics in PipeConc, Layer 2
 		END DO
 
+		DeltaConc = 0.0d0									! reset DeltaConc for next integration step
+
+
+		!!!!!!!!!!!!!!!!!!!!!
+		!! FLOW OF LIQUIDS !!
+		!!!!!!!!!!!!!!!!!!!!!
+
+		IF (PointZ == 1) THEN
+			DummyFlowInMat(1,:) = 0.0d0							! the concentrations before the pipe starts are 0, so that there can be no inflow
+			DummyFlowInMat(1,:) = PipeConc(PointX,PointY,PointZ,:,1)			! the concentrations at the start of the pipe are the choes concentrations of the pipe...
+			
+			CALL FLOW_INT(PipeLength, NGridZ, FlowMat(PointX,PointY), &			! calculates the change in concentration by laminar flow
+			DummyFlowInMat, dTime, DeltaConc)						! using the current point and the previous point in z direction
+		ELSE
+			CALL FLOW_INT(PipeLength, NGridZ, FlowMat(PointX,PointY), &			! calculates the change in concentration by laminar flow
+			PipeConc(PointX,PointY,PointZ-1:PointZ,:,1), dTime, DeltaConc)			! using the current point and the previous point in z direction
+		END IF
+
+		DO lambda = 1, Omega
+			PipeConc(PointX,PointY,PointZ,lambda,2) = DeltaConc(lambda) &
+			+ PipeConc(PointX,PointY,PointZ,lambda,2)					! add changes in concetration due to laminar flow to the changes in concentrations
+		END DO
+
+		DeltaConc = 0.0d0									! reset DeltaConc for next integration step
+
+
+		!!!!!!!!!!!!!!!!
+		!! DIFFUSSION !!
+		!!!!!!!!!!!!!!!!
 
 	END DO												! stop iterate over points in Z	
 	END DO												! stop iterate over points in Y

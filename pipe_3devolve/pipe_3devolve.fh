@@ -57,6 +57,8 @@
 !
 ! DeltaConc	--> intermediate vector, storing changes in concentrations after the subintegrations
 !
+! DummyFlowInMat --> giving FLOW_INT a matrix where the previous points in z direction all have concentrations of 0
+!
 
 INTEGER, DIMENSION(:,:), INTENT(IN) :: EdMat, ProdMat
 INTEGER, INTENT(IN) :: NGridXY, NgridZ, method
@@ -64,6 +66,7 @@ REAL*8, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY,1:NGridZ,1:SIZE(EdMat,2),1
 REAL*8, DIMENSION(:), INTENT(IN) :: RateVec
 REAL*8, INTENT(IN) :: dTime, FinalTime, PipeLength, PipeRadius, vmax, vadd
 LOGICAL, INTENT(IN) :: InFlow
+REAL*8, DIMENSION(2,SIZE(EdMat,2)) :: DummyFlowInMat
 
 INTEGER :: Omega, N, I, lambda, SubsNum, NSteps, IntStep, PointX, PointY, PointZ, ZGridElementsMPI
 

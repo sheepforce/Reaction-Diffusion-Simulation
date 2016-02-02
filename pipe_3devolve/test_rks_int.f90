@@ -18,7 +18,7 @@ INTERFACE
 		REAL*8, INTENT(IN) :: dTime
 		INTEGER, INTENT(IN) :: method
 
-		REAL*8, DIMENSION(:), INTENT(OUT) :: DeltaConc
+		REAL*8, DIMENSION(1:SIZE(ConcVec)), INTENT(OUT) :: DeltaConc
 
 		INTEGER :: Omega, N, I, lambda, SubsNum
 		REAL*8, DIMENSION(:), ALLOCATABLE :: ODEVec

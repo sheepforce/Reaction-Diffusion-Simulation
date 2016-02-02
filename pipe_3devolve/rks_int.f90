@@ -36,7 +36,8 @@
 !
 ! method        --> integer determining which integrator to use
 !
-! 
+! DeltaConc	--> stores the CHANGE of every concentration due to reaction kinetics and returns
+! 		them to the calling pogramm
 
 SUBROUTINE RKS_INT(EdMat, ProdMat, RateVec, ConcVec, dTime, method, DeltaConc)
 
@@ -46,7 +47,7 @@ REAL*8, DIMENSION(:), INTENT(IN) :: RateVec , ConcVec
 REAL*8, INTENT(IN) :: dTime
 INTEGER, INTENT(IN) :: method
 
-REAL*8, DIMENSION(:), INTENT(OUT) :: DeltaConc
+REAL*8, DIMENSION(1:SIZE(ConcVec)), INTENT(OUT) :: DeltaConc
 
 INTEGER :: Omega, N, I, lambda, SubsNum
 REAL*8, DIMENSION(:), ALLOCATABLE :: ODEVec
