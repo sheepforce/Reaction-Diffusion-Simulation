@@ -54,7 +54,7 @@
 
 
 SUBROUTINE PIPE_3DEVOLVE(PipeLength, PipeRadius, NGridXY, NGridZ, vmax, vadd, dTime, &
-FinalTime, EdMat, ProdMat, RateVec, PipeConc, method, Inflow)
+FinalTime, EdMat, ProdMat, RateVec, DiffVec, PipeConc, method, Inflow)
 
 USE mpi
 
@@ -107,6 +107,20 @@ INTERFACE
 	END SUBROUTINE
 END INTERFACE
 
+INTERFACE
+	SUBROUTINE DIFF_INT(ConcEnv, DiffVec, DeltaConc)
+
+		IMPLICIT NONE
+		REAL*8, DIMENSION(-1:,-1:,-1:,:), INTENT(IN) :: ConcEnv
+		REAL*8, DIMENSION(:), INTENT(IN) :: DiffVec
+
+		REAL*8, DIMENSION(1:SIZE(DiffVec)), INTENT(OUT) :: DeltaConc
+
+		REAL*8 :: LAPLACIAN
+	END SUBROUTINE
+END INTERFACE
+
+
 CALL MPI_INIT(ierr)											! fork the processes with MPI
 CALL MPI_COMM_RANK(MPI_COMM_WORLD, ProcID, ierr)							! get the ID of the current process
 CALL MPI_COMM_SIZE(MPI_COMM_WORLD, NProcs, ierr)							! how many MPI processes are there over all
@@ -148,8 +162,8 @@ CALL FIND_PIPE(vmax,NGridXY, PipeArea)									! find the grid points inside the
 
 FlowMat = 0.0d0
 
-DO PointX = -NgridXY, NGridXY
-	DO PointY = -NgridXY, NGridXY
+DO PointX = -NGridXY, +NGridXY
+	DO PointY = -NgridXY, +NGridXY
 		IF (PipeArea(PointX,PointY) .EQV. .TRUE.) THEN
 			FlowMat(PointX,PointY) = FLOW_PROFILE(PointX, PointY, vmax, vadd, NGridXY)	! calculate flow profile inside the pipe, stored in FlowMat
 		END IF
@@ -172,12 +186,13 @@ DO IntStep = 1, NSteps											! Integrate over time
 
 	DO PointX = -NgridXY, +NGridXY									! iterate over points in X
 	DO PointY = -NGridXY, +NgridXY									! iterate over points in Y
-	DO PointZ = ProcID + 1, NGridZ, NProcs								! iterate over points in Z, distributed with MPI
 
-		! if we are not in the pipe area at the current point we do not need to solve nothing...
-		IF (PipeArea(PointX,PointY) .EQV. .FALSE.) THEN
-			EXIT
-		END IF		
+	! if we are not in the pipe area at the current point we do not need to solve nothing...
+	IF (PipeArea(PointX,PointY) .EQV. .FALSE.) THEN
+		EXIT
+	END IF		
+
+	DO PointZ = ProcID + 1, NGridZ, NProcs								! iterate over points in Z, distributed with MPI
 
 
 		!!!!!!!!!!!!!!!!!!!!!!!
@@ -222,9 +237,46 @@ DO IntStep = 1, NSteps											! Integrate over time
 		!! DIFFUSSION !!
 		!!!!!!!!!!!!!!!!
 
+		DummyDiffInMat = 0.0d0									! intialize dummy input for DIFF_INT, that will be adapted to constraints due to boundaries of the pipe
+		DummyDiffInMat = PipeConc(PointX-1:PointX+1,PointY-1:PointY+1,PointZ-1:PointZ+1,:,1)	! if neighbouring points are not at the boundaries this is simply the corresponding segment of PipeConc
+
+		! now testing if any of the relevant neighbouring points is outside an replace its values with the value of the center
+		IF (PipeArea(PointX-1,PointY) .EQV. .FALSE.) THEN					! is PointX-1 outside
+			DummyDiffInMat(-1,:,:,:) = PipeConc(PointX,PointY-1:PointY+1,PointZ-1:PointZ+1,:,1)
+		END IF
+		IF (PipeArea(PointX+1,PointY) .EQV. .FALSE.) THEN					! is PointX+1 outside
+			DummyDiffInMat(+1,:,:,:) = PipeConc(PointX,PointY-1:PointY+1,PointZ-1:PointZ+1,:,1)
+		END IF
+		IF (PipeArea(PointX,PointY-1) .EQV. .FALSE.) THEN					! is PointY-1 outside
+			DummyDiffInMat(:,-1,:,:) = PipeConc(PointX-1:PointX+1,PointY,PointZ-1:PointZ+1,:,1)
+		END IF
+		IF (PipeArea(PointX,PointY+1) .EQV. .FALSE.) THEN					! is PointY+1 outside
+			DummyDiffInMat(:,+1,:,:) = PipeConc(PointX-1:PointX+1,PointY,PointZ-1:PointZ+1,:,1)
+		END IF
+		IF (PointZ - 1 < 1) THEN								! are we at the start of the pipe
+			DummyDiffInMat(:,:,PointZ-1,:) = PipeConc(PointX-1:PointX+1,PointY-1:PointY+1,PointZ,:,1)
+		END IF
+		IF (PointZ + 1 > NGridZ) THEN								! are we at the end of the pipe
+			DummyDiffInMat(:,:,PointZ+1,:) = PipeConc(PointX-1:PointX+1,PointY-1:PointY+1,PointZ,:,1)
+		END IF
+
+		CALL DIFF_INT(DummyDiffInMat, DiffVec, DeltaConc)
+
+		DO lambda = 1, Omega
+                        PipeConc(PointX,PointY,PointZ,lambda,2) = DeltaConc(lambda) &
+                        + PipeConc(PointX,PointY,PointZ,lambda,2)                                       ! add changes in concetration due to laminar flow to the changes in concentrations
+                END DO
+
+		DeltaConc = 0.0d0
+
+
 	END DO												! stop iterate over points in Z	
 	END DO												! stop iterate over points in Y
 	END DO												! stop iterate over points in X
+
+
+	! MPI_SEND for all processes that are not root to send values in PipeConc(:,:,:,:,2) back to root
+	! Root thread sums them up and calculates new concentrations
 
 
 END DO													! end integrate over time

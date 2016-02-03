@@ -3,6 +3,7 @@ IMPLICIT NONE
 
 REAL*8 :: PipeLength, PipeRadius, vmax, vadd, dTime, FinalTime
 REAL*8, DIMENSION(2) :: RateVec
+REAL*8, DIMENSION(4) :: DiffVec
 REAL*8, DIMENSION(:,:,:,:,:), ALLOCATABLE :: PipeConc
 INTEGER :: NGridXY, method, NGridZ, Omega, N, lambda, I, PointX, PointY, PointZ
 INTEGER, DIMENSION(2,4) :: EdMat, ProdMat
@@ -11,7 +12,7 @@ LOGICAL :: Inflow = .TRUE.
 
 INTERFACE
 	SUBROUTINE PIPE_3DEVOLVE(PipeLength, PipeRadius, NGridXY, NGridZ, vmax, vadd, dTime, &
-	FinalTime, EdMat, ProdMat, RateVec, PipeConc, method, Inflow)
+	FinalTime, EdMat, ProdMat, RateVec, DiffVec, PipeConc, method, Inflow)
 		USE mpi
 
 		INCLUDE 'pipe_3devolve.fh'
@@ -70,6 +71,8 @@ PipeConc(:,:,1,3,1) = 2.0d0							! c(C)
 PipeConc(:,:,1,4,1) = 0.2d0							! c(C)
 PipeConc(:,:,2:,:,1) = 0.0d0							! concentration of all substances from first xy plane away are 0
 
+DiffVec = 0.0d0
+
 !WRITE(*, *)
 !WRITE(*, *) "Here are the start conditions"
 !WRITE(*, *) "NGridXY = ", NGridXY
@@ -126,6 +129,6 @@ WRITE(*, *) "*** now calling PIPE_3DEVOLVE ***"
 WRITE(*, *) "*********************************"
 
 CALL PIPE_3DEVOLVE(PipeLength, PipeRadius, NGridXY, NGridZ, vmax, vadd, dTime, &
-FinalTime, EdMat, ProdMat, RateVec, PipeConc, method, Inflow)
+FinalTime, EdMat, ProdMat, RateVec, DiffVec, PipeConc, method, Inflow)
 
 END PROGRAM
