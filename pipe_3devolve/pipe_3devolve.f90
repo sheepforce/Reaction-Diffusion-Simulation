@@ -189,7 +189,7 @@ DO IntStep = 1, NSteps											! Integrate over time
 
 	! if we are not in the pipe area at the current point we do not need to solve nothing...
 	IF (PipeArea(PointX,PointY) .EQV. .FALSE.) THEN
-		EXIT
+		CYCLE
 	END IF		
 
 	DO PointZ = ProcID + 1, NGridZ, NProcs								! iterate over points in Z, distributed with MPI
