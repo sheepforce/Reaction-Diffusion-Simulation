@@ -63,6 +63,9 @@
 !		with replaced concentrations outside the boundaries
 !
 !*DiffVec	--> vector containing diffusion constants, [1 ... Omega]
+!
+! LocConcChange	--> array storing the CHANGES in concentration at the end of integration step, necessary for MPI_RECV and MPI_SEND
+!
 
 INTEGER, DIMENSION(:,:), INTENT(IN) :: EdMat, ProdMat
 INTEGER, INTENT(IN) :: NGridXY, NgridZ, method
@@ -72,6 +75,7 @@ REAL*8, INTENT(IN) :: dTime, FinalTime, PipeLength, PipeRadius, vmax, vadd
 LOGICAL, INTENT(IN) :: InFlow
 REAL*8, DIMENSION(2,SIZE(EdMat,2)) :: DummyFlowInMat
 REAL*8, DIMENSION(-1:+1,-1:+1,-1:+1,SIZE(EdMat,2)) :: DummyDiffInMat
+REAL*8, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY,1:NGridZ,1:SIZE(EdMat,2)) :: LocConcChange
 
 INTEGER :: Omega, N, I, lambda, SubsNum, NSteps, IntStep, PointX, PointY, PointZ
 

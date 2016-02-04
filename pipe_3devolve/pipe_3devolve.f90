@@ -63,6 +63,7 @@ IMPLICIT NONE
 INCLUDE 'pipe_3devolve.fh'
 
 INTEGER :: ierr, NProcs, ProcID, IProc, GenericTag = 1, BCastSendCount
+INTEGER, DIMENSION(MPI_STATUS_SIZE) :: status
 
 INTERFACE
         SUBROUTINE FIND_PIPE(vmax, NGridXY, PipeArea)
@@ -179,6 +180,16 @@ END DO
 BCastSendCount = SIZE(PipeConc) / 2
 
 DO IntStep = 1, NSteps											! Integrate over time
+	!!//////////////!!
+	!! OUTPUT START !!
+	!!\\\\\\\\\\\\\\!!
+	IF (ProcID == 0 .AND. MOD(IntStep, NSteps / 100) == 0) THEN
+		WRITE(*, *) "Now at time step", IntStep, " of ", NSteps					! write the integration step to output
+	END IF
+	!!//////////////!!
+	!!  OUTPUT END  !!
+	!!\\\\\\\\\\\\\\!!
+
 	CALL MPI_BCAST(PipeConc, BCastSendCount, MPI_DOUBLE_PRECISION, 0, MPI_COMM_WORLD, ierr)		! distribute the new start concentrations to all threads
 	
 	DeltaConc = 0.0d0										! reset DeltaConc after each integration step
@@ -277,6 +288,26 @@ DO IntStep = 1, NSteps											! Integrate over time
 
 	! MPI_SEND for all processes that are not root to send values in PipeConc(:,:,:,:,2) back to root
 	! Root thread sums them up and calculates new concentrations
+	IF (ProcID == 0) THEN
+		DO IProc = 1, NProcs - 1
+			CALL MPI_RECV(LocConcChange, BCastSendCount, MPI_DOUBLE_PRECISION, &		! receive array with concentration changes of every thread
+			MPI_ANY_SOURCE, GenericTag, MPI_COMM_WORLD, status, ierr)
+
+			PipeConc(:,:,:,:,2) = PipeConc(:,:,:,:,2) + LocConcChange			! sum up the concentration changes of root thread and the other threads
+
+			LocConcChange = 0.0d0
+		END DO
+	ELSE IF (ProcID /= 0) THEN
+			LocConcChange = PipeConc(:,:,:,:,2)
+			CALL MPI_SEND(LocConcChange, BCastSendCount, MPI_DOUBLE_PRECISION, &		! send array with changes in concentrations to the root thread
+			0, GenericTag, MPI_COMM_WORLD, status, ierr)
+			
+	END IF
+
+	! calculating the concentrations for the new round by using the concentrations of this round and the concentration changes
+	IF (ProcID == 0) THEN
+		PipeConc(:,:,:,:,1) = PipeConc(:,:,:,:,1) + PipeConc(:,:,:,:,2)
+	END IF
 
 
 END DO													! end integrate over time
