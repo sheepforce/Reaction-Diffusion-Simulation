@@ -306,7 +306,15 @@ DO IntStep = 1, NSteps											! Integrate over time
 
 	! calculating the concentrations for the new round by using the concentrations of this round and the concentration changes
 	IF (ProcID == 0) THEN
-		PipeConc(:,:,:,:,1) = PipeConc(:,:,:,:,1) + PipeConc(:,:,:,:,2)
+		IF (InFlow .EQV. .TRUE.) THEN
+			PipeConc(:,:,2:,:,1) = PipeConc(:,:,2:,:,1) + PipeConc(:,:,2:,:,2)		! all except the inflow layer changes
+			PipeConc(:,:,1,:,1) = PipeConc(:,:,1,:,1)					! the inflow layer stays constant
+		ELSE
+			PipeConc(:,:,:,:,1) = PipeConc(:,:,:,:,1) + PipeConc(:,:,:,:,2)
+		END IF
+
+
+
 	END IF
 
 
