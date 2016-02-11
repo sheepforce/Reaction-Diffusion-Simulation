@@ -126,17 +126,6 @@ CALL MPI_INIT(ierr)											! fork the processes with MPI
 CALL MPI_COMM_RANK(MPI_COMM_WORLD, ProcID, ierr)							! get the ID of the current process
 CALL MPI_COMM_SIZE(MPI_COMM_WORLD, NProcs, ierr)							! how many MPI processes are there over all
 
-!!=============!!
-!! DEBUG START !!
-!!=============!!
-
-WRITE(*, *) "============================"
-WRITE(*, *) "|| Here is PIPE_3DEVOLVE  ||"
-WRITE(*, *) "============================"
-
-!!=============!!
-!!  DEBUG END  !!
-!!=============!!
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -153,6 +142,52 @@ IF (method < 1 .OR. method > 1) THEN
         RETURN
 END IF
 
+
+!!//////////////!!
+!! OUTPUT START !!
+!!\\\\\\\\\\\\\\!!
+IF (ProcID == 0) THEN
+	1000 FORMAT (A80)
+	1001 FORMAT (4X, A)
+	1002 FORMAT (1X, I2.2, 1X)
+	1003 FORMAT (1X, D12.6, 1X)
+	             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	WRITE(*, 1000) "==============================="
+	WRITE(*, 1000) "||   PIPE 3D EVOLVE MODULE   ||"
+	WRITE(*, 1000) "==============================="
+	WRITE(*, FMT='(2/)')
+	WRITE(*, 1001) "Input Parameters"
+	WRITE(*, 1001) "----------------"
+	WRITE(* ,*)
+	WRITE(*, 1001) "matrix of stochiometric coefficients of the educts --> EdMat"
+	DO I = 1, N
+		WRITE(*, FMT='(8X)', ADVANCE='NO')
+	DO lambda = 1, Omega
+		WRITE(*, 1002, ADVANCE='NO') EdMat(I, lambda)
+	END DO
+		WRITE(*, *)
+	END DO
+	WRITE(*, *)
+	WRITE(*, 1001) "matrix of stochiometric coefficients of the products --> ProdMat"
+        DO I = 1, N
+                WRITE(*, FMT='(8X)', ADVANCE='NO')
+        DO lambda = 1, Omega
+                WRITE(*, 1002, ADVANCE='NO') ProdMat(I, lambda)
+        END DO
+                WRITE(*, *)
+        END DO
+	WRITE(*, *)
+	WRITE(*, 1001) "vector of the the rate coefficients of reactions --> RateVec"
+	DO I = 1, N
+		WRITE(*, FMT='(8X)', ADVANCE='NO')
+		WRITE(*, 1003) RateVec(I)
+	END DO
+
+
+END IF
+!!//////////////!!
+!!  OUTPUT END  !!
+!!\\\\\\\\\\\\\\!!
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! INITIALIZE GRID AND PIPE !!
