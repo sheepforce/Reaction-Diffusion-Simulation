@@ -28,7 +28,7 @@ REAL*8, INTENT(IN) :: PipeLength, vFlowXY, dtime
 REAL*8, DIMENSION(:,:), INTENT(IN) :: FlowConcMat
 INTEGER, INTENT(IN) :: NGridZ
 
-REAL*8, DIMENSION(SIZE(FlowConcMat,2)), INTENT(OUT) :: DeltaConc
+REAL*8, DIMENSION(SIZE(FlowConcMat, 2)), INTENT(OUT) :: DeltaConc
 
 REAL*8 :: DeltaL, DeltaN
 INTEGER :: Omega, I, lambda

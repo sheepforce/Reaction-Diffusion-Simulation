@@ -18,3 +18,5 @@ routines:
 clean:
 	rm *.o
 	rm *.bin
+	rm *.dat
+	rm -rf out

@@ -64,6 +64,7 @@ INCLUDE 'pipe_3devolve.fh'
 
 INTEGER :: ierr, NProcs, ProcID, IProc, GenericTag = 1, BCastSendCount
 INTEGER, DIMENSION(MPI_STATUS_SIZE) :: status
+CHARACTER*12 :: IntName, SubsName
 
 INTERFACE
         SUBROUTINE FIND_PIPE(vmax, NGridXY, PipeArea)
@@ -139,7 +140,8 @@ lambda = 1
 I = 1
 SubsNum = 1
 IF (method < 1 .OR. method > 1) THEN
-        RETURN
+	WRITE(*, *) "ERROR :  Requested not implemented integration method"
+        STOP 201
 END IF
 
 
@@ -151,7 +153,7 @@ IF (ProcID == 0) THEN
 	1001 FORMAT (4X, A)
 	1002 FORMAT (1X, I2.2, 1X)
 	1003 FORMAT (1X, D12.6, 1X)
-	             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 	WRITE(*, 1000) "==============================="
 	WRITE(*, 1000) "||   PIPE 3D EVOLVE MODULE   ||"
 	WRITE(*, 1000) "==============================="
@@ -162,18 +164,18 @@ IF (ProcID == 0) THEN
 	WRITE(*, 1001) "matrix of stochiometric coefficients of the educts --> EdMat"
 	DO I = 1, N
 		WRITE(*, FMT='(8X)', ADVANCE='NO')
-	DO lambda = 1, Omega
-		WRITE(*, 1002, ADVANCE='NO') EdMat(I, lambda)
-	END DO
+		DO lambda = 1, Omega
+			WRITE(*, 1002, ADVANCE='NO') EdMat(I, lambda)
+		END DO
 		WRITE(*, *)
 	END DO
 	WRITE(*, *)
 	WRITE(*, 1001) "matrix of stochiometric coefficients of the products --> ProdMat"
         DO I = 1, N
                 WRITE(*, FMT='(8X)', ADVANCE='NO')
-        DO lambda = 1, Omega
-                WRITE(*, 1002, ADVANCE='NO') ProdMat(I, lambda)
-        END DO
+        	DO lambda = 1, Omega
+                	WRITE(*, 1002, ADVANCE='NO') ProdMat(I, lambda)
+	        END DO
                 WRITE(*, *)
         END DO
 	WRITE(*, *)
@@ -182,8 +184,24 @@ IF (ProcID == 0) THEN
 		WRITE(*, FMT='(8X)', ADVANCE='NO')
 		WRITE(*, 1003) RateVec(I)
 	END DO
+	WRITE(*, *)
+	WRITE(*, 1001) "vector of the diffusion coefficients of substances --> DiffVec"
+	DO lambda = 1, Omega
+		WRITE(*, FMT='(8X)', ADVANCE='NO')
+		WRITE(*, 1003) DiffVec(lambda)
 
-
+	END DO
+	WRITE(*, *)
+	WRITE(*, *)
+	WRITE(*, FMT='(4X, A, D12.6)') "length of the pipe : ", PipeLength
+	WRITE(*, FMT='(4X, A, D12.6)') "radius of the pipe : ", PipeRadius
+	WRITE(*, FMT='(4X, A, I12)')   "radial grid points : ", NGridXY
+	WRITE(*, FMT='(4X, A, I12)')   "grid points in z   : ", NGridZ
+	WRITE(*, FMT='(4X, A, D12.6)') "size of time steps : ", dTime
+	WRITE(*, FMT='(4X, A, I12)')   "integration steps  : ", NSteps
+	WRITE(*, FMT='(4X, A, D12.6)') "flow speed vmax    : ", vmax
+	WRITE(*, FMT='(4X, A, D12.6)') "flow speed vadd    : ", vadd
+	WRITE(*, FMT='(4X, A, L12, /,/,/)') "pipe has inflow	   : ", InFlow
 END IF
 !!//////////////!!
 !!  OUTPUT END  !!
@@ -206,6 +224,42 @@ DO PointX = -NGridXY, +NGridXY
 	END DO
 END DO
 
+!!//////////////!!
+!! OUTPUT START !!
+!!\\\\\\\\\\\\\\!!
+IF (ProcID == 0) THEN
+	WRITE(*, 1001) "Calculation"
+	WRITE(*, 1001) "-----------"
+	WRITE(*, *)
+	WRITE(*, 1001) "Found pipe area"
+	DO PointX = -NGridXY, +NGridXY
+		WRITE(*, FMT='(8X)', ADVANCE='NO')
+		DO PointY = -NGridXY, +NGridXY
+			WRITE(*, FMT='(L1, 1X)', ADVANCE='NO') PipeArea(PointX,PointY)
+		END DO
+		WRITE(*, *)
+	END DO
+	WRITE(*, *)
+	WRITE(*, 1001) "Writing Speed Profile in the pipe to SpeedProfile.dat"
+	OPEN(UNIT=201, FILE="SpeedProfile.dat", ACTION='write')
+        DO PointX = -NGridXY, +NGridXY
+	        DO PointY = -NGridXY, +NGridXY
+			IF (PipeArea(PointX,PointY) .EQV. .TRUE.) THEN
+				WRITE(UNIT=201, FMT='(D12.6, 1X)', ADVANCE='NO') FlowMat(PointX,PointY)
+			ELSE
+				WRITE(UNIT=201, FMT='(6X, A1, 6X)', ADVANCE='NO') "F"
+			END IF
+        	END DO
+                WRITE(201, *)
+        END DO	
+	CLOSE(UNIT=201)
+	WRITE(*, FMT='(/,/)')
+END IF
+
+!!//////////////!!
+!!  OUTPUT END  !!
+!!\\\\\\\\\\\\\\!!
+
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! INTEGRATION OVER TIME !!
@@ -214,12 +268,36 @@ END DO
 ! distribute PipeConc(:,:,:,:,1) to all MPI threads, number of elements to send
 BCastSendCount = SIZE(PipeConc) / 2
 
+
+!! DEBUG START
+OPEN(UNIT=999, FILE="DeltaConc.debug")
+!! DEBUG END
+
 DO IntStep = 1, NSteps											! Integrate over time
 	!!//////////////!!
 	!! OUTPUT START !!
 	!!\\\\\\\\\\\\\\!!
 	IF (ProcID == 0 .AND. MOD(IntStep, NSteps / 100) == 0) THEN
-		WRITE(*, *) "Now at time step", IntStep, " of ", NSteps					! write the integration step to output
+		WRITE(*, FMT='(4X, A17, I12, A4, I12)') "Integration step ", IntStep, " of ", NSteps	! write integration step to output
+	END IF
+
+	! create the concentration outputs
+	IF (ProcID == 0 .AND. MOD(IntStep, 5) == 0) THEN						! write all 5 time steps output
+		WRITE(IntName, FMT='(I0)') IntStep							! write current integration step to String IntName
+		CALL SYSTEM('mkdir -p out/t_'//TRIM(IntName))						! create output directory and in this directory directories for time steps
+		
+		DO lambda = 1, Omega									! iterate over substances
+			WRITE(SubsName, FMT='(I0)') lambda						
+			OPEN(UNIT=202, FILE="out/t_"//TRIM(IntName)//"/Subs"//TRIM(SubsName)//".dat")	! write different outputs for different susbstances 
+			DO PointZ = 1, NGridZ
+				DO PointX = -NGridXY, +NGridXY
+					WRITE(202, *) PipeConc(PointX,-NGridXY:,PointZ,lambda,1)
+				END DO
+			WRITE(202, *)
+			END DO
+			CLOSE(UNIT=202)
+		END DO
+
 	END IF
 	!!//////////////!!
 	!!  OUTPUT END  !!
@@ -234,9 +312,9 @@ DO IntStep = 1, NSteps											! Integrate over time
 	DO PointY = -NGridXY, +NgridXY									! iterate over points in Y
 
 	! if we are not in the pipe area at the current point we do not need to solve nothing...
-	IF (PipeArea(PointX,PointY) .EQV. .FALSE.) THEN
-		CYCLE
-	END IF		
+!	IF (PipeArea(PointX,PointY) .EQV. .FALSE.) THEN
+!		CYCLE
+!	END IF		
 
 	DO PointZ = ProcID + 1, NGridZ, NProcs								! iterate over points in Z, distributed with MPI
 
@@ -259,6 +337,7 @@ DO IntStep = 1, NSteps											! Integrate over time
 		!!!!!!!!!!!!!!!!!!!!!
 		!! FLOW OF LIQUIDS !!
 		!!!!!!!!!!!!!!!!!!!!!
+		
 
 		IF (PointZ == 1) THEN
 			DummyFlowInMat(1,:) = 0.0d0							! the concentrations before the pipe starts are 0, so that there can be no inflow
@@ -267,14 +346,29 @@ DO IntStep = 1, NSteps											! Integrate over time
 			CALL FLOW_INT(PipeLength, NGridZ, FlowMat(PointX,PointY), &			! calculates the change in concentration by laminar flow
 			DummyFlowInMat, dTime, DeltaConc)						! using the current point and the previous point in z direction
 		ELSE
+			DummyFlowInMat(1,:) = PipeConc(PointX,PointY,PointZ-1,:,1)
+			DummyFlowInMat(2,:) = PipeConc(PointX,PointY,PointZ,:,1)
+
 			CALL FLOW_INT(PipeLength, NGridZ, FlowMat(PointX,PointY), &			! calculates the change in concentration by laminar flow
-			PipeConc(PointX,PointY,PointZ-1:PointZ,:,1), dTime, DeltaConc)			! using the current point and the previous point in z direction
+			DummyFlowInMat, dTime, DeltaConc)						! using the current point and the previous point in z direction
 		END IF
 
 		DO lambda = 1, Omega
 			PipeConc(PointX,PointY,PointZ,lambda,2) = DeltaConc(lambda) &
 			+ PipeConc(PointX,PointY,PointZ,lambda,2)					! add changes in concetration due to laminar flow to the changes in concentrations
 		END DO
+
+		!! DEBUG START
+		IF (ProcID == 0 .AND. IntStep == 1 .AND. PointZ == 1) THEN
+			WRITE(999, FMT='(D12.6, 2X)', ADVANCE='NO') DeltaConc(1)
+			
+		END IF
+		
+		IF (ProcID == 0 .AND. IntStep == 1 .AND. PointX == 0 .AND. PointY == 0) THEN
+!			WRITE(*, *) "DummyFlowInMat(:,1)", DummyFlowInMat(:,1)
+			WRITE(*, *) FlowMat(PointX,PointY)
+		END IF
+		!! DEBUG END 
 
 		DeltaConc = 0.0d0									! reset DeltaConc for next integration step
 
@@ -318,6 +412,9 @@ DO IntStep = 1, NSteps											! Integrate over time
 
 	END DO												! stop iterate over points in Z	
 	END DO												! stop iterate over points in Y
+	!! DEBUG START
+	WRITE(999, *) 
+	!! DEBUG END
 	END DO												! stop iterate over points in X
 
 
@@ -352,8 +449,11 @@ DO IntStep = 1, NSteps											! Integrate over time
 
 	END IF
 
-
 END DO													! end integrate over time
+
+!! DEBUG START
+CLOSE(UNIT=999)
+!! DEBUG END
 
 CALL MPI_FINALIZE(ierr)
 
