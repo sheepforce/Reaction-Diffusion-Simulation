@@ -312,9 +312,9 @@ DO IntStep = 1, NSteps											! Integrate over time
 	DO PointY = -NGridXY, +NgridXY									! iterate over points in Y
 
 	! if we are not in the pipe area at the current point we do not need to solve nothing...
-!	IF (PipeArea(PointX,PointY) .EQV. .FALSE.) THEN
-!		CYCLE
-!	END IF		
+	IF (PipeArea(PointX,PointY) .EQV. .FALSE.) THEN
+		CYCLE
+	END IF		
 
 	DO PointZ = ProcID + 1, NGridZ, NProcs								! iterate over points in Z, distributed with MPI
 
@@ -338,38 +338,36 @@ DO IntStep = 1, NSteps											! Integrate over time
 		!! FLOW OF LIQUIDS !!
 		!!!!!!!!!!!!!!!!!!!!!
 		
+		DummyFLowInMat = 0.0d0									! make sure DummyFLowInMat is reseted
 
-		IF (PointZ == 1) THEN
-			DummyFlowInMat(1,:) = 0.0d0							! the concentrations before the pipe starts are 0, so that there can be no inflow
-			DummyFlowInMat(2,:) = PipeConc(PointX,PointY,PointZ,:,1)			! the concentrations at the start of the pipe are the chosen concentrations of the pipe...
-			
-			CALL FLOW_INT(PipeLength, NGridZ, FlowMat(PointX,PointY), &			! calculates the change in concentration by laminar flow
-			DummyFlowInMat, dTime, DeltaConc)						! using the current point and the previous point in z direction
-		ELSE
-			DummyFlowInMat(1,:) = PipeConc(PointX,PointY,PointZ-1,:,1)
-			DummyFlowInMat(2,:) = PipeConc(PointX,PointY,PointZ,:,1)
-
-			CALL FLOW_INT(PipeLength, NGridZ, FlowMat(PointX,PointY), &			! calculates the change in concentration by laminar flow
-			DummyFlowInMat, dTime, DeltaConc)						! using the current point and the previous point in z direction
-		END IF
-
-		DO lambda = 1, Omega
-			PipeConc(PointX,PointY,PointZ,lambda,2) = DeltaConc(lambda) &
-			+ PipeConc(PointX,PointY,PointZ,lambda,2)					! add changes in concetration due to laminar flow to the changes in concentrations
-		END DO
-
-		!! DEBUG START
-		IF (ProcID == 0 .AND. IntStep == 1 .AND. PointZ == 1) THEN
-			WRITE(999, FMT='(D12.6, 2X)', ADVANCE='NO') DeltaConc(1)
-			
-		END IF
-		
-		IF (ProcID == 0 .AND. IntStep == 1 .AND. PointX == 0 .AND. PointY == 0) THEN
+!		IF (PointZ == 1) THEN
+!			DummyFlowInMat(1,:) = 0.0d0
+!		ELSE
+!			DummyFlowInMat(1,:) = PipeConc(PointX,PointY,PointZ-1,:,1)
+!		END IF
+!		DummyFlowInMat(2,:) = PipeConc(PointX,PointY,PointZ,:,1)
+!
+!		CALL FLOW_INT(PipeLength, NGridZ, FlowMat(PointX,PointY), &				! calculates the change in concentration by laminar flow
+!		DummyFlowInMat, dTime, DeltaConc)							! using the current point and the previous point in z direction
+!
+!		DO lambda = 1, Omega
+!			PipeConc(PointX,PointY,PointZ,lambda,2) = DeltaConc(lambda) &
+!			+ PipeConc(PointX,PointY,PointZ,lambda,2)					! add changes in concetration due to laminar flow to the changes in concentrations
+!		END DO
+!
+!		!! DEBUG START
+!		IF (ProcID == 0 .AND. IntStep == 1 .AND. PointZ == 1) THEN
+!			WRITE(999, FMT='(D12.6, 2X)', ADVANCE='NO') DeltaConc(1)
+!			
+!		END IF
+!		
+!		IF (ProcID == 0 .AND. IntStep == 1 .AND. PointX == 0 .AND. PointY == 0) THEN
 !			WRITE(*, *) "DummyFlowInMat(:,1)", DummyFlowInMat(:,1)
-			WRITE(*, *) FlowMat(PointX,PointY)
-		END IF
+!			WRITE(*, *) FlowMat(PointX,PointY)
+!		END IF
 		!! DEBUG END 
 
+		DummyFlowInMat = 0.0d0									! reset DummyFlowInMat for next steps
 		DeltaConc = 0.0d0									! reset DeltaConc for next integration step
 
 

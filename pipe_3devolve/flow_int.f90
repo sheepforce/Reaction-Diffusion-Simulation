@@ -50,7 +50,7 @@ DeltaL = vFlowXY * dTime										! calculate the displacement in absolut space
 DeltaN = DeltaL / (PipeLength / DBLE(NGridZ))								! calculate the displacement in relative grid space
 
 ! if the movement would be larger than 1 cell the values are not reliable, therefore kill the 
-! programm, raice an exception and 
+! programm, raice an exception and print an error
 IF (DeltaN > 1.0d0) THEN
 	WRITE(*, *) "ERROR : Integration step too large. You must choose smaller integration steps."
 	WRITE(*, *) "ERROR : Movement im Grid points would be", DeltaN

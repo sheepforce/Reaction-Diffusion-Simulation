@@ -27,10 +27,10 @@ WRITE(*, *) "================================="
 WRITE(*, *)
 WRITE(*, *) "Initializing variables now"
 
-NGridXY = 5
+NGridXY = 4
 vmax = 1.0d0
-vadd = 1.0d-1
-PipeLength = 2.0d0
+vadd = 1.0d0
+PipeLength = 5.0d0
 PipeRadius = 5.0d0
 dTime = 0.1d-1
 FinalTime = 1.0d3
@@ -71,7 +71,10 @@ PipeConc(:,:,1,3,1) = 2.0d0							! c(C)
 PipeConc(:,:,1,4,1) = 0.2d0							! c(C)
 PipeConc(:,:,2:,:,1) = 0.0d0							! concentration of all substances from first xy plane away are 0
 
-DiffVec = 0.0d0
+DiffVec(1) = 0.0d0
+DiffVec(2) = 0.0d0
+DiffVec(2) = 0.0d0
+DiffVec(4) = 0.0d0
 
 !WRITE(*, *)
 !WRITE(*, *) "Here are the start conditions"
