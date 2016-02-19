@@ -4,7 +4,7 @@ REAL*8 FUNCTION RHS_ODE(EdMat, ProdMat, RateVec, ConcVec, SubsNum)
 IMPLICIT NONE
 
 INTEGER, DIMENSION(:,:), INTENT(IN) :: EdMat, ProdMat
-INTEGER :: Omega, N, I, lambda, SubsNum, NSteps, IntStep
+INTEGER :: Omega, N, I, lambda, SubsNum, NSteps
 REAL*8, DIMENSION(:), INTENT(IN) :: RateVec , ConcVec
 
 REAL*8, DIMENSION(1:SIZE(RateVec)) :: ConcProd

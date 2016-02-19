@@ -95,17 +95,15 @@ INTERFACE
 END INTERFACE
 
 INTERFACE
-	SUBROUTINE FLOW_INT(PipeLength, NGridZ, vFlowXY, FlowConcMat, dTime, DeltaConc)
-
+	SUBROUTINE FLOW_INT(LocalConc, vLoc, dTime, PipeLength, NGridZ, Omega, DeltaConc)
 		IMPLICIT NONE
-		REAL*8, INTENT(IN) :: PipeLength, vFlowXY, dtime
-		REAL*8, DIMENSION(:,:), INTENT(IN) :: FlowConcMat
-		INTEGER, INTENT(IN) :: NGridZ
+		REAL*8, DIMENSION(1:2,1:Omega), INTENT(IN) :: LocalConc
+		REAL*8, INTENT(IN) :: vLoc, dTime, PipeLength
+		INTEGER, INTENT(IN) :: NGridZ, Omega
+		REAL*8, DIMENSION(1:Omega), INTENT(OUT) :: DeltaConc
 
-		REAL*8, DIMENSION(SIZE(FlowConcMat,2)), INTENT(OUT) :: DeltaConc
-
-		REAL*8 :: DeltaL, DeltaN
-		INTEGER :: Omega, I, lambda
+		INTEGER :: lambda
+		REAL*8 :: AbsMove, GridMove
 	END SUBROUTINE
 END INTERFACE
 
@@ -269,11 +267,9 @@ END IF
 BCastSendCount = SIZE(PipeConc) / 2
 
 
-!! DEBUG START
-OPEN(UNIT=999, FILE="DeltaConc.debug")
-!! DEBUG END
-
 DO IntStep = 1, NSteps											! Integrate over time
+
+
 	!!//////////////!!
 	!! OUTPUT START !!
 	!!\\\\\\\\\\\\\\!!
@@ -338,36 +334,27 @@ DO IntStep = 1, NSteps											! Integrate over time
 		!! FLOW OF LIQUIDS !!
 		!!!!!!!!!!!!!!!!!!!!!
 		
-		DummyFLowInMat = 0.0d0									! make sure DummyFLowInMat is reseted
+		IF (PointZ == 1) THEN
+			LocalConc(1,:) = 0.0d0								! no inflow from non existing points outside the pipe
+			LocalConc(2,:) = PipeConc(PointX,PointY,PointZ,:,1)
+		ELSE
+			LocalConc(1,:) = PipeConc(PointX,PointY,PointZ-1,:,1)				! concentration on previous point in z
+			LocalConc(2,:) = PipeConc(PointX,PointY,PointZ,:,1)				! concentration on current point in z
+		END IF
+		
+		!! DEBUG START
+		FlowMat(PointX,PointY) = FLOW_PROFILE(PointX, PointY, vmax, vadd, NGridXY)		! AT THE MOMENT THIS IS NECESSARY, BECAUSE OF UNKNOWN REASON FlowMat IS BEEING
+													! CHANGED AT SOME INDIZES IN EVERY INTEGRATION STEP
+!		WRITE(*, *) PointX, PointY
+		!! DEBUG END
 
-!		IF (PointZ == 1) THEN
-!			DummyFlowInMat(1,:) = 0.0d0
-!		ELSE
-!			DummyFlowInMat(1,:) = PipeConc(PointX,PointY,PointZ-1,:,1)
-!		END IF
-!		DummyFlowInMat(2,:) = PipeConc(PointX,PointY,PointZ,:,1)
-!
-!		CALL FLOW_INT(PipeLength, NGridZ, FlowMat(PointX,PointY), &				! calculates the change in concentration by laminar flow
-!		DummyFlowInMat, dTime, DeltaConc)							! using the current point and the previous point in z direction
-!
-!		DO lambda = 1, Omega
-!			PipeConc(PointX,PointY,PointZ,lambda,2) = DeltaConc(lambda) &
-!			+ PipeConc(PointX,PointY,PointZ,lambda,2)					! add changes in concetration due to laminar flow to the changes in concentrations
-!		END DO
-!
-!		!! DEBUG START
-!		IF (ProcID == 0 .AND. IntStep == 1 .AND. PointZ == 1) THEN
-!			WRITE(999, FMT='(D12.6, 2X)', ADVANCE='NO') DeltaConc(1)
-!			
-!		END IF
-!		
-!		IF (ProcID == 0 .AND. IntStep == 1 .AND. PointX == 0 .AND. PointY == 0) THEN
-!			WRITE(*, *) "DummyFlowInMat(:,1)", DummyFlowInMat(:,1)
-!			WRITE(*, *) FlowMat(PointX,PointY)
-!		END IF
-		!! DEBUG END 
+		CALL FLOW_INT(LocalConc, FlowMat(PointX,PointY), dTime, PipeLength, NGridZ, Omega, DeltaConc)
 
-		DummyFlowInMat = 0.0d0									! reset DummyFlowInMat for next steps
+		DO lambda = 1, Omega
+			PipeConc(PointX,PointY,PointZ,lambda,2) = DeltaConc(lambda) &			! add changes in concetration due to laminar flow to the changes in concentrations
+			+ PipeConc(PointX,PointY,PointZ,lambda,2)
+		END DO
+
 		DeltaConc = 0.0d0									! reset DeltaConc for next integration step
 
 
@@ -402,7 +389,7 @@ DO IntStep = 1, NSteps											! Integrate over time
 
 		DO lambda = 1, Omega
                         PipeConc(PointX,PointY,PointZ,lambda,2) = DeltaConc(lambda) &
-                        + PipeConc(PointX,PointY,PointZ,lambda,2)                                       ! add changes in concetration due to laminar flow to the changes in concentrations
+                        + PipeConc(PointX,PointY,PointZ,lambda,2)                                       ! add changes in concetration due to diffusion to the changes in concentrations
                 END DO
 
 		DeltaConc = 0.0d0
@@ -410,9 +397,6 @@ DO IntStep = 1, NSteps											! Integrate over time
 
 	END DO												! stop iterate over points in Z	
 	END DO												! stop iterate over points in Y
-	!! DEBUG START
-	WRITE(999, *) 
-	!! DEBUG END
 	END DO												! stop iterate over points in X
 
 
@@ -449,9 +433,6 @@ DO IntStep = 1, NSteps											! Integrate over time
 
 END DO													! end integrate over time
 
-!! DEBUG START
-CLOSE(UNIT=999)
-!! DEBUG END
 
 CALL MPI_FINALIZE(ierr)
 

@@ -7,7 +7,7 @@ REAL*8, DIMENSION(4) :: DiffVec
 REAL*8, DIMENSION(:,:,:,:,:), ALLOCATABLE :: PipeConc
 INTEGER :: NGridXY, method, NGridZ, Omega, N, lambda, I, PointX, PointY, PointZ
 INTEGER, DIMENSION(2,4) :: EdMat, ProdMat
-LOGICAL :: Inflow = .FALSE.
+LOGICAL :: Inflow = .TRUE.
 
 
 INTERFACE
@@ -28,12 +28,12 @@ WRITE(*, *)
 WRITE(*, *) "Initializing variables now"
 
 NGridXY = 4
-vmax = 1.0d0
-vadd = 1.0d0
+vmax = 1.0d-1
+vadd = 0.0d0
 PipeLength = 5.0d0
 PipeRadius = 5.0d0
 dTime = 0.1d-1
-FinalTime = 1.0d3
+FinalTime = 2.0d2
 method = 1
 
 NGridZ = NINT(PipeLength / (PipeRadius / NGridXY))

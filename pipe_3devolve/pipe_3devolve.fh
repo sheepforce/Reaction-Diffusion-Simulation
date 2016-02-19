@@ -57,7 +57,7 @@
 !
 ! DeltaConc	--> intermediate vector, storing changes in concentrations after the subintegrations
 !
-! DummyFlowInMat --> giving FLOW_INT a matrix where the previous points in z direction all have concentrations of 0
+! LocalConc	--> giving FLOW_INT a matrix where the previous points in z direction are previous point of PipeConc
 !
 ! DummyDiffInMat --> giving DIFF_INT a matrix with adapted concentration values for calculating the laplacian
 !		with replaced concentrations outside the boundaries
@@ -73,7 +73,7 @@ REAL*8, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY,1:NGridZ,1:SIZE(EdMat,2),1
 REAL*8, DIMENSION(:), INTENT(IN) :: RateVec, DiffVec
 REAL*8, INTENT(IN) :: dTime, FinalTime, PipeLength, PipeRadius, vmax, vadd
 LOGICAL, INTENT(IN) :: InFlow
-REAL*8, DIMENSION(2,SIZE(EdMat,2)) :: DummyFlowInMat
+REAL*8, DIMENSION(1:2,1:SIZE(EdMat,2)) :: LocalConc
 REAL*8, DIMENSION(-1:+1,-1:+1,-1:+1,SIZE(EdMat,2)) :: DummyDiffInMat
 REAL*8, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY,1:NGridZ,1:SIZE(EdMat,2)) :: LocConcChange
 

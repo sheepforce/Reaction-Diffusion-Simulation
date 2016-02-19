@@ -1,67 +1,47 @@
-! FLOW_INT will calculate the changes in conentrations of each substance due to flow of the liquid.
-! The concentration of a cell changes because of outflow and inflow. Outflow needs the concentration
-! of the current cell, inflow the concentration of current cell - 1 and therefore FlowConcMat stores in
-! the first index the current coentrations (2) and the conentrations of the precursor cell (1) and in the
-! second index the concentrations of each Substance. 
-! 
-! PipeLength	--> length of the pipe as in the calling programm
-!
-! vFlowXY	--> flow speed at current point
-!
-! FlowConcMat	--> Matrix of the Size (2,Omega), containinig concentrations of substances at the current (2)
-! 		and previous point (1)
-!
-! dTime		--> Integrations step size
-!
-! DeltaConc	--> Output of the CHANGES in concentration in the current cell to the calling programm
-!
-! DeltaN	--> displacement of the concentration. Is the number of cells the concentrations should be
-! 		displaced and should allway be smaller than 1
-!
-! DeltaL	--> displacement of the concentration. Is the real distance concentration would be displaced
-!
 
-SUBROUTINE FLOW_INT(PipeLength, NGridZ, vFlowXY, FlowConcMat, dTime, DeltaConc)
+! Subroutine FLOW_INT calculates changes in concentration due to laminar flow.
+! Takes local flow speed, vLoc, time step size, dTime, the Length of the pipe,
+! PipeLenght, the number of Grid points in z direction, NGridZ, the number of 
+! sunstances in the system, Omega.
+! LocalConc stores prevoius (1) and current point (2) in first index, substances
+! in the second index
+! returns the CHANGES in concentration for every substances at the current point
+! in DeltaConc
 
+SUBROUTINE FLOW_INT(LocalConc, vLoc, dTime, PipeLength, NGridZ, Omega, DeltaConc)
 IMPLICIT NONE
-REAL*8, INTENT(IN) :: PipeLength, vFlowXY, dtime
-REAL*8, DIMENSION(:,:), INTENT(IN) :: FlowConcMat
-INTEGER, INTENT(IN) :: NGridZ
+REAL*8, DIMENSION(1:2,1:Omega), INTENT(IN) :: LocalConc
+REAL*8, INTENT(IN) :: vLoc, dTime, PipeLength
+INTEGER, INTENT(IN) :: NGridZ, Omega
+REAL*8, DIMENSION(1:Omega), INTENT(OUT) :: DeltaConc
 
-REAL*8, DIMENSION(SIZE(FlowConcMat, 2)), INTENT(OUT) :: DeltaConc
+INTEGER :: lambda
+REAL*8 :: AbsMove, GridMove
 
-REAL*8 :: DeltaL, DeltaN
-INTEGER :: Omega, I, lambda
+!! DEBUG START
+!WRITE(*, *) "vLoc is", vLoc
+!! DEBUG END
 
+!!!!!!!!!!!!!!!!!!!!
+!! INITIALIZATION !!
+!!!!!!!!!!!!!!!!!!!!
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!
-!! INITIALIZATION PHASE !!
-!!!!!!!!!!!!!!!!!!!!!!!!!!
+AbsMove = vLoc * dTime											! movement of liquid in real units
+GridMove = AbsMove / (PipeLength / DBLE(NGridZ))							! movement of liquid in grid points
 
-Omega = SIZE(FlowConcMat, 2)
-lambda = 1
-
-
-!!!!!!!!!!!!!!!!!!!!!!!
-!! CALCULATION PHASE !!
-!!!!!!!!!!!!!!!!!!!!!!!
-
-DeltaL = vFlowXY * dTime										! calculate the displacement in absolut space
-DeltaN = DeltaL / (PipeLength / DBLE(NGridZ))								! calculate the displacement in relative grid space
-
-! if the movement would be larger than 1 cell the values are not reliable, therefore kill the 
-! programm, raice an exception and print an error
-IF (DeltaN > 1.0d0) THEN
-	WRITE(*, *) "ERROR : Integration step too large. You must choose smaller integration steps."
-	WRITE(*, *) "ERROR : Movement im Grid points would be", DeltaN
-	WRITE(*, *) "ERROR : Will terminate now, look over your input again!"
+IF (GridMove > 1.0d0) THEN
+	WRITE(*, *) "ERROR : too large movement due to laminar flow, would be", GridMove, "points"
+	WRITE(*, *) "ERROR : would move concentrations more than 1 grid point. Not reliable"
+	WRITE(*, *) "ERROR : redefine flow speed or integration step size in your input"
 	STOP 221
 END IF
 
-! decrease in concentration due to outflow from current cell and increase due to inflow from previous cell
-DO lambda = 1, Omega
-	DeltaConc(lambda) = - DeltaN * FlowConcMat(2,lambda) + DeltaN * FlowConcMat(1,lambda)
-END DO
+!!!!!!!!!!!!!!!!!
+!! CALCULATION !!
+!!!!!!!!!!!!!!!!!
 
+DO lambda = 1, Omega
+	DeltaConc(lambda) = +LocalConc(1,lambda) * GridMove - LocalConc(2,lambda) * GridMove		! inflow from previous point, outflow from current point
+END DO
 
 END SUBROUTINE
