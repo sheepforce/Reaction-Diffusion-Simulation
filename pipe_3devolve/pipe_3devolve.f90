@@ -62,9 +62,10 @@ IMPLICIT NONE
 
 INCLUDE 'pipe_3devolve.fh'
 
-INTEGER :: ierr, NProcs, ProcID, IProc, GenericTag = 1, BCastSendCount
+INTEGER :: ierr, NProcs, ProcID, IProc, GenericTag = 1, BCastSendCount, WriteInt			! WriteInt gives the distance of integration steps to write out PipeConc
 INTEGER, DIMENSION(MPI_STATUS_SIZE) :: status
 CHARACTER*12 :: IntName, SubsName
+REAL*8, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY) :: LoopFlowMat
 
 INTERFACE
         SUBROUTINE FIND_PIPE(vmax, NGridXY, PipeArea)
@@ -137,6 +138,7 @@ NSteps = NINT(FinalTime / dTime)
 lambda = 1
 I = 1
 SubsNum = 1
+WriteInt = NSteps / 1000										! Write 1000 outputs
 IF (method < 1 .OR. method > 1) THEN
 	WRITE(*, *) "ERROR :  Requested not implemented integration method"
         STOP 201
@@ -222,6 +224,11 @@ DO PointX = -NGridXY, +NGridXY
 	END DO
 END DO
 
+! copy of the original FlowMat for integration in loop. Necessary because FlowMat changes for unknown
+! reason in the integration loop at some specifi indizes
+LoopFlowMat = FlowMat											
+
+
 !!//////////////!!
 !! OUTPUT START !!
 !!\\\\\\\\\\\\\\!!
@@ -266,6 +273,21 @@ END IF
 ! distribute PipeConc(:,:,:,:,1) to all MPI threads, number of elements to send
 BCastSendCount = SIZE(PipeConc) / 2
 
+!!//////////////!!
+!! OUTPUT START !!
+!!\\\\\\\\\\\\\\!!
+!! BINARY !!
+OPEN(UNIT=202, FILE="Pipe.dat", FORM='UNFORMATTED', ACCESS='stream', ACTION='WRITE')
+
+! create binary header for reading and converting later
+WRITE(202) NGridXY
+WRITE(202) NGridZ
+WRITE(202) Omega
+WRITE(202) NSteps
+WRITE(202) WriteInt
+!!//////////////!!
+!!  OUTPUT END  !!
+!!\\\\\\\\\\\\\\!!
 
 DO IntStep = 1, NSteps											! Integrate over time
 
@@ -273,27 +295,8 @@ DO IntStep = 1, NSteps											! Integrate over time
 	!!//////////////!!
 	!! OUTPUT START !!
 	!!\\\\\\\\\\\\\\!!
-	IF (ProcID == 0 .AND. MOD(IntStep, NSteps / 100) == 0) THEN
+	IF (ProcID == 0 .AND. MOD(IntStep, NSteps / 1000) == 0) THEN
 		WRITE(*, FMT='(4X, A17, I12, A4, I12)') "Integration step ", IntStep, " of ", NSteps	! write integration step to output
-	END IF
-
-	! create the concentration outputs
-	IF (ProcID == 0 .AND. MOD(IntStep, 5) == 0) THEN						! write all 5 time steps output
-		WRITE(IntName, FMT='(I0)') IntStep							! write current integration step to String IntName
-		CALL SYSTEM('mkdir -p out/t_'//TRIM(IntName))						! create output directory and in this directory directories for time steps
-		
-		DO lambda = 1, Omega									! iterate over substances
-			WRITE(SubsName, FMT='(I0)') lambda						
-			OPEN(UNIT=202, FILE="out/t_"//TRIM(IntName)//"/Subs"//TRIM(SubsName)//".dat")	! write different outputs for different susbstances 
-			DO PointZ = 1, NGridZ
-				DO PointX = -NGridXY, +NGridXY
-					WRITE(202, *) PipeConc(PointX,-NGridXY:,PointZ,lambda,1)
-				END DO
-			WRITE(202, *)
-			END DO
-			CLOSE(UNIT=202)
-		END DO
-
 	END IF
 	!!//////////////!!
 	!!  OUTPUT END  !!
@@ -343,12 +346,13 @@ DO IntStep = 1, NSteps											! Integrate over time
 		END IF
 		
 		!! DEBUG START
-		FlowMat(PointX,PointY) = FLOW_PROFILE(PointX, PointY, vmax, vadd, NGridXY)		! AT THE MOMENT THIS IS NECESSARY, BECAUSE OF UNKNOWN REASON FlowMat IS BEEING
+!		FlowMat(PointX,PointY) = FLOW_PROFILE(PointX, PointY, vmax, vadd, NGridXY)		! AT THE MOMENT THIS IS NECESSARY, BECAUSE OF UNKNOWN REASON FlowMat IS BEEING
 													! CHANGED AT SOME INDIZES IN EVERY INTEGRATION STEP
 !		WRITE(*, *) PointX, PointY
 		!! DEBUG END
 
-		CALL FLOW_INT(LocalConc, FlowMat(PointX,PointY), dTime, PipeLength, NGridZ, Omega, DeltaConc)
+		CALL FLOW_INT(LocalConc, LoopFlowMat(PointX,PointY), dTime, PipeLength, &		! calculates the changes in concentrations due to laminar flow
+		NGridZ, Omega, DeltaConc)
 
 		DO lambda = 1, Omega
 			PipeConc(PointX,PointY,PointZ,lambda,2) = DeltaConc(lambda) &			! add changes in concetration due to laminar flow to the changes in concentrations
@@ -415,7 +419,6 @@ DO IntStep = 1, NSteps											! Integrate over time
 			LocConcChange = PipeConc(:,:,:,:,2)
 			CALL MPI_SEND(LocConcChange, BCastSendCount, MPI_DOUBLE_PRECISION, &		! send array with changes in concentrations to the root thread
 			0, GenericTag, MPI_COMM_WORLD, status, ierr)
-			
 	END IF
 
 	! calculating the concentrations for the new round by using the concentrations of this round and the concentration changes
@@ -426,14 +429,58 @@ DO IntStep = 1, NSteps											! Integrate over time
 		ELSE
 			PipeConc(:,:,:,:,1) = PipeConc(:,:,:,:,1) + PipeConc(:,:,:,:,2)
 		END IF
-
-
-
 	END IF
+
+	!!//////////////!!
+	!! OUTPUT START !!
+	!!\\\\\\\\\\\\\\!!
+	! create the concentration outputs
+	
+	!! PLAIN TEXT !!
+!	IF (ProcID == 0 .AND. MOD(IntStep, 5) == 0) THEN						! write all 5 time steps output
+!		WRITE(IntName, FMT='(I0)') IntStep							! write current integration step to String IntName
+!		CALL SYSTEM('mkdir -p out/t_'//TRIM(IntName))						! create output directory and in this directory directories for time steps
+!		
+!		DO lambda = 1, Omega									! iterate over substances
+!			WRITE(SubsName, FMT='(I0)') lambda						
+!			OPEN(UNIT=202, FILE="out/t_"//TRIM(IntName)//"/Subs"//TRIM(SubsName)//".dat")	! write different outputs for different susbstances 
+!			DO PointZ = 1, NGridZ
+!				DO PointX = -NGridXY, +NGridXY
+!					WRITE(202, *) PipeConc(PointX,-NGridXY:,PointZ,lambda,1)
+!				END DO
+!			WRITE(202, *)
+!			END DO
+!			CLOSE(UNIT=202)
+!		END DO
+!	END IF
+
+	!! BINARY !!
+	IF (ProcID == 0 .AND. MOD(IntStep, WriteInt) == 0) THEN						! write all 5 time steps outpu
+		WRITE(202) PipeConc(:,:,:,:,1)								! write array to binary output
+	END IF	
+	!!//////////////!!
+	!!  OUTPUT END  !!
+	!!\\\\\\\\\\\\\\!!
 
 END DO													! end integrate over time
 
 
 CALL MPI_FINALIZE(ierr)
+
+!!//////////////!!
+!! OUTPUT START !!
+!!\\\\\\\\\\\\\\!!
+IF (ProcID == 0) THEN
+	CLOSE(UNIT=202)
+
+	WRITE(*, FMT='(/,/)')
+        WRITE(*, 1001) "Calculation finished. Check Pipe.dat for evolution of concentration"
+	WRITE(*, *)
+	WRITE(*, 1001) "Leaving PIPE 3D EVOLVE now. Shutting down parallel computing. Bye!"
+	WRITE(*, 1001) "------------------------------------------------------------------"
+END IF
+!!//////////////!!
+!!  OUTPUT END  !!
+!!\\\\\\\\\\\\\\!!
 
 END SUBROUTINE

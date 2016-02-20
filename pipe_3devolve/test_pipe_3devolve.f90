@@ -27,12 +27,12 @@ WRITE(*, *) "================================="
 WRITE(*, *)
 WRITE(*, *) "Initializing variables now"
 
-NGridXY = 4
-vmax = 1.0d-1
-vadd = 0.0d0
-PipeLength = 5.0d0
-PipeRadius = 5.0d0
-dTime = 0.1d-1
+NGridXY = 10
+vmax = 1.0d-3
+vadd = 1.0d-4
+PipeLength = 1.0d0
+PipeRadius = 1.0d-2
+dTime = 1.0d-3
 FinalTime = 2.0d2
 method = 1
 
@@ -73,7 +73,7 @@ PipeConc(:,:,2:,:,1) = 0.0d0							! concentration of all substances from first 
 
 DiffVec(1) = 0.0d0
 DiffVec(2) = 0.0d0
-DiffVec(2) = 0.0d0
+DiffVec(3) = 0.0d0
 DiffVec(4) = 0.0d0
 
 !WRITE(*, *)
