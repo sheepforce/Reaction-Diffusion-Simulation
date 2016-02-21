@@ -296,7 +296,12 @@ DO IntStep = 1, NSteps											! Integrate over time
 	!! OUTPUT START !!
 	!!\\\\\\\\\\\\\\!!
 	IF (ProcID == 0 .AND. MOD(IntStep, NSteps / 1000) == 0) THEN
-		WRITE(*, FMT='(4X, A17, I12, A4, I12)') "Integration step ", IntStep, " of ", NSteps	! write integration step to output
+		WRITE(*, FMT='(4X, A17, I12, A4, I12, 2X)', ADVANCE='NO') "Integration step ", IntStep, " of ", NSteps
+		WRITE(*, FMT='(I3, 1X, A1, 2X)') INT((DBLE(IntStep) / DBLE(NSteps)) * 100), "%"
+		IF (MINVAL(PipeConc(:,:,:,:,1)) < 0.0d0) THEN
+			WRITE(*, *) "WARNING : Numerical instability in integration, c_min < 0"
+			WRITE(*, *) "WARNING : c_min", MINVAL(PipeConc(:,:,:,:,1))
+		END IF
 	END IF
 	!!//////////////!!
 	!!  OUTPUT END  !!
