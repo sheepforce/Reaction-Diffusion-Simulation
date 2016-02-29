@@ -33,7 +33,7 @@ vadd = 1.0d-4
 PipeLength = 5.0d-1
 PipeRadius = 1.0d-2
 dTime = 1.0d-3
-FinalTime = 1.0d2
+FinalTime = 1.0d1
 method = 1
 
 NGridZ = NINT(PipeLength / (PipeRadius / NGridXY))

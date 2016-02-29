@@ -14,7 +14,8 @@ routines:
 	$(FC) $(FFLAGS) -c flow_profile.f90 find_pipe.f90 rks_int.f90 rks_rhs_ode.f90 flow_int.f90 laplacian.f90 diff_int.f90
 
 reform_conc:
-	$(FC) $(FFLAGS) reform_conc.f90 -o reform_conc.bin
+	$(FC) $(FFLAGS) reform_concH.f90 -o reform_concH.bin
+	$(FC) $(FFLAGS) reform_concP.f90 -o reform_concP.bin
 
 clean:
 	rm *.o
