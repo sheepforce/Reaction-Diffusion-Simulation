@@ -27,14 +27,14 @@ WRITE(*, *) "================================="
 WRITE(*, *)
 WRITE(*, *) "Initializing variables now"
 
-NGridXY = 5
+NGridXY = 4
 vmax = 1.0d-3
 vadd = 1.0d-4
 PipeLength = 5.0d-1
 PipeRadius = 1.0d-2
-dTime = 1.0d-3
+dTime = 5.0d-3
 FinalTime = 1.0d1
-method = 1
+method = 2
 
 NGridZ = NINT(PipeLength / (PipeRadius / NGridXY))
 

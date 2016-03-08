@@ -51,7 +51,7 @@ REAL*8, DIMENSION(1:SIZE(ConcVec)), INTENT(OUT) :: DeltaConc
 
 INTEGER :: Omega, N, I, lambda, SubsNum
 REAL*8, DIMENSION(:), ALLOCATABLE :: ODEVec
-REAL*8 :: RHS_ODE
+REAL*8 :: RHS_ODE, RK4_INT
 
 INTERFACE
         FUNCTION RHS_ODE(EdMat, ProdMat, RateVec, ConcVec, SubsNum)
@@ -63,6 +63,14 @@ INTERFACE
 		REAL*8, DIMENSION(1:SIZE(RateVec)) :: ConcProd
 		REAL*8 :: SIGMAProd, SIGMACons
         END FUNCTION RHS_ODE
+END INTERFACE
+
+INTERFACE
+	FUNCTION RK4_INT(RHSInit, dTime)
+		IMPLICIT NONE
+		REAL*8, INTENT(IN) :: RHSInit, dTime
+		INTEGER :: k1, k2, k3, k4
+	END FUNCTION RK4_INT
 END INTERFACE
 
 
@@ -88,9 +96,15 @@ DO lambda = 1, Omega
 END DO
 
 ! calculate the __CHANGE__ in concentration of every substance
-DO lambda = 1, Omega
-	DeltaConc(lambda) = ODEVec(lambda) * dtime
-END DO
+IF (method == 1) THEN											! plain EULER integrator
+	DO lambda = 1, Omega
+		DeltaConc(lambda) = ODEVec(lambda) * dtime
+	END DO
+ELSE IF (method == 2) THEN										! RUNGE KUTTA 4th order
+	DO lambda = 1, Omega
+		DeltaConc(Lambda) = RK4_INT(ODEVec(lambda), dTime)
+	END DO
+END IF
 
 DEALLOCATE(ODEVec)
 

@@ -7,7 +7,7 @@ INTEGER, DIMENSION(2,4) :: EdMat, ProdMat
 REAL*8, DIMENSION(4) :: ConcVec
 REAL*8, DIMENSION(2) :: RateVec
 REAL*8 :: dtime = 1.0d-2, finaltime=1.0d3
-INTEGER :: method = 1, i, lambda, Omega, NSteps, N, IntStep
+INTEGER :: method = 2, i, lambda, Omega, NSteps, N, IntStep
 REAL*8, DIMENSION(4) :: DeltaConc
 
 INTERFACE
@@ -110,6 +110,8 @@ DO IntStep = 1, NSteps
 	DO lambda = 1, Omega
 		ConcVec(lambda) = DeltaConc(lambda) + ConcVec(lambda)
 	END DO
+
+!	WRITE(*, *) "DeltaConc(1) is", DeltaConc(1)
 
         WRITE(UNIT=100, FMT='(D16.8, A4, $)') IntStep * dtime, "    "                                           ! writing the time t$
         DO lambda = 1, Omega

@@ -139,7 +139,7 @@ lambda = 1
 I = 1
 SubsNum = 1
 WriteInt = NSteps / 1000										! Write 1000 outputs
-IF (method < 1 .OR. method > 1) THEN
+IF (method < 1 .OR. method > 2) THEN
 	WRITE(*, *) "ERROR :  Requested not implemented integration method"
         STOP 201
 END IF
@@ -201,7 +201,14 @@ IF (ProcID == 0) THEN
 	WRITE(*, FMT='(4X, A, I12)')   "integration steps  : ", NSteps
 	WRITE(*, FMT='(4X, A, D12.6)') "flow speed vmax    : ", vmax
 	WRITE(*, FMT='(4X, A, D12.6)') "flow speed vadd    : ", vadd
-	WRITE(*, FMT='(4X, A, L12, /,/,/)') "pipe has inflow	   : ", InFlow
+	WRITE(*, FMT='(4X, A)', ADVANCE='NO') "integrator (kin.)  : "
+	IF (method == 1) THEN
+		WRITE(*, FMT='(4X, A)') "Euler"
+	ELSE IF (method == 2) THEN
+		 WRITE(*, FMT='(4X, A)') "Runge-Kutta 4th order"
+	END IF
+	WRITE(*, FMT='(4X, A, L12, /,/,/)') "pipe has inflow  	   : ", InFlow
+
 END IF
 !!//////////////!!
 !!  OUTPUT END  !!
