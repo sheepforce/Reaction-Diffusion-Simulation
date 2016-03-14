@@ -1,5 +1,15 @@
+# Redefine this variables for custome build
+
+# Fortran Compiler, possible options:
 FC		= mpif90
-FFLAGS		= -O3 -march=native -mtune=native -funroll-loops -ffast-math -mfpmath=sse
+#FC		= gfortran
+
+# Compilerflags for fortran compiler
+FFLAGS		= -fopenmp -cpp -O3 -march=native -mtune=native -funroll-loops -ffast-math -mfpmath=sse
+
+# Preprocessor variables
+# use MPI parallelitzation? Alternatively openMP will be used
+#FPPOPTIONS	= -DopenMPI=y		# use MPI parallelization
 
 all: reform_conc test_pipe_3devolve test_rks_int
 
@@ -12,7 +22,7 @@ test_rks_int: routines
 	$(FC) $(FFLAGS) test_rks_int.o rks_int.o rks_rhs_ode.o rks_rk4int.o -o test_rks_int.bin
 
 pipe_3devolve: routines
-	$(FC) $(FFLAGS) -c pipe_3devolve.f90
+	$(FC) $(FFLAGS) $(FPPOPTIONS) -c pipe_3devolve.f90
 
 routines:
 	$(FC) $(FFLAGS) -c flow_profile.f90 find_pipe.f90 rks_int.f90 rks_rhs_ode.f90 flow_int.f90 laplacian.f90 diff_int.f90 rks_rk4int.f90

@@ -56,14 +56,21 @@
 SUBROUTINE PIPE_3DEVOLVE(PipeLength, PipeRadius, NGridXY, NGridZ, vmax, vadd, dTime, &
 FinalTime, EdMat, ProdMat, RateVec, DiffVec, PipeConc, method, Inflow)
 
+#ifdef openMPI
 USE mpi
+#else
+USE omp_lib
+#endif
+
 
 IMPLICIT NONE
 
 INCLUDE 'pipe_3devolve.fh'
 
 INTEGER :: ierr, NProcs, ProcID, IProc, GenericTag = 1, BCastSendCount, WriteInt			! WriteInt gives the distance of integration steps to write out PipeConc
+#ifdef openMPI
 INTEGER, DIMENSION(MPI_STATUS_SIZE) :: status
+#endif
 CHARACTER*12 :: IntName, SubsName
 REAL*8, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY) :: LoopFlowMat
 
@@ -122,10 +129,11 @@ INTERFACE
 END INTERFACE
 
 
+#ifdef openMPI
 CALL MPI_INIT(ierr)											! fork the processes with MPI
 CALL MPI_COMM_RANK(MPI_COMM_WORLD, ProcID, ierr)							! get the ID of the current process
 CALL MPI_COMM_SIZE(MPI_COMM_WORLD, NProcs, ierr)							! how many MPI processes are there over all
-
+#endif
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -144,11 +152,15 @@ IF (method < 1 .OR. method > 2) THEN
         STOP 201
 END IF
 
+NUMTHREAD = 4
+
 
 !!//////////////!!
 !! OUTPUT START !!
 !!\\\\\\\\\\\\\\!!
+#ifdef openMPI
 IF (ProcID == 0) THEN
+#endif
 	1000 FORMAT (A80)
 	1001 FORMAT (4X, A)
 	1002 FORMAT (1X, I2.2, 1X)
@@ -209,7 +221,9 @@ IF (ProcID == 0) THEN
 	END IF
 	WRITE(*, FMT='(4X, A, L12, /,/,/)') "pipe has inflow  	   : ", InFlow
 
+#ifdef openMPI
 END IF
+#endif
 !!//////////////!!
 !!  OUTPUT END  !!
 !!\\\\\\\\\\\\\\!!
@@ -239,7 +253,9 @@ LoopFlowMat = FlowMat
 !!//////////////!!
 !! OUTPUT START !!
 !!\\\\\\\\\\\\\\!!
+#ifdef openMPI
 IF (ProcID == 0) THEN
+#endif
 	WRITE(*, 1001) "Calculation"
 	WRITE(*, 1001) "-----------"
 	WRITE(*, *)
@@ -266,7 +282,9 @@ IF (ProcID == 0) THEN
         END DO	
 	CLOSE(UNIT=201)
 	WRITE(*, FMT='(/,/)')
+#ifdef openMPI
 END IF
+#endif
 
 !!//////////////!!
 !!  OUTPUT END  !!
@@ -284,6 +302,9 @@ BCastSendCount = SIZE(PipeConc) / 2
 !! OUTPUT START !!
 !!\\\\\\\\\\\\\\!!
 !! BINARY !!
+#ifdef openMPI
+IF (ProcID == 0) THEN
+#endif
 OPEN(UNIT=202, FILE="Pipe.dat", FORM='UNFORMATTED', ACCESS='stream', ACTION='WRITE')
 
 ! create binary header for reading and converting later
@@ -292,9 +313,13 @@ WRITE(202) NGridZ
 WRITE(202) Omega
 WRITE(202) NSteps
 WRITE(202) WriteInt
+#ifdef openMPI
+END IF
+#endif
 !!//////////////!!
 !!  OUTPUT END  !!
 !!\\\\\\\\\\\\\\!!
+
 
 DO IntStep = 1, NSteps											! Integrate over time
 
@@ -302,7 +327,11 @@ DO IntStep = 1, NSteps											! Integrate over time
 	!!//////////////!!
 	!! OUTPUT START !!
 	!!\\\\\\\\\\\\\\!!
+#ifdef openMPI
 	IF (ProcID == 0 .AND. MOD(IntStep, NSteps / 1000) == 0) THEN
+#else
+	IF (MOD(IntStep, NSteps / 1000) == 0) THEN
+#endif
 		WRITE(*, FMT='(4X, A17, I12, A4, I12, 2X)', ADVANCE='NO') "Integration step ", IntStep, " of ", NSteps
 		WRITE(*, FMT='(I3, 1X, A1, 2X)') INT((DBLE(IntStep) / DBLE(NSteps)) * 100), "%"
 		IF (MINVAL(PipeConc(:,:,:,:,1)) < 0.0d0) THEN
@@ -314,7 +343,9 @@ DO IntStep = 1, NSteps											! Integrate over time
 	!!  OUTPUT END  !!
 	!!\\\\\\\\\\\\\\!!
 
+#ifdef openMPI
 	CALL MPI_BCAST(PipeConc, BCastSendCount, MPI_DOUBLE_PRECISION, 0, MPI_COMM_WORLD, ierr)		! distribute the new start concentrations to all threads
+#endif
 	
 	DeltaConc = 0.0d0										! reset DeltaConc after each integration step
 	PipeConc(:,:,:,:,2) = 0.0d0									! reset PipeConc(:,:,:,:,2) after each integration step
@@ -327,7 +358,13 @@ DO IntStep = 1, NSteps											! Integrate over time
 		CYCLE
 	END IF		
 
+#ifdef openMPI
 	DO PointZ = ProcID + 1, NGridZ, NProcs								! iterate over points in Z, distributed with MPI
+#else
+	!$OMP PARALLEL NUM_THREADS(NUMTHREAD)
+	!$OMP DO
+	DO PointZ = 1, NGridZ
+#endif
 
 
 		!!!!!!!!!!!!!!!!!!!!!!!
@@ -379,45 +416,90 @@ DO IntStep = 1, NSteps											! Integrate over time
 		!!!!!!!!!!!!!!!!
 
 		DummyDiffInMat = 0.0d0									! intialize dummy input for DIFF_INT, that will be adapted to constraints due to boundaries of the pipe
-		DummyDiffInMat = PipeConc(PointX-1:PointX+1,PointY-1:PointY+1,PointZ-1:PointZ+1,:,1)	! if neighbouring points are not at the boundaries this is simply the corresponding segment of PipeConc
+!! SAVED FOR HISTORY
+!		DummyDiffInMat = PipeConc(PointX-1:PointX+1,PointY-1:PointY+1,PointZ-1:PointZ+1,:,1)	! if neighbouring points are not at the boundaries this is simply the corresponding segment of PipeConc
+!
+!		! now testing if any of the relevant neighbouring points is outside an replace its values with the value of the center
+!		IF (PipeArea(PointX-1,PointY) .EQV. .FALSE.) THEN					! is PointX-1 outside
+!			DummyDiffInMat(-1,:,:,:) = PipeConc(PointX,PointY-1:PointY+1,PointZ-1:PointZ+1,:,1)
+!		END IF
+!		IF (PipeArea(PointX+1,PointY) .EQV. .FALSE.) THEN					! is PointX+1 outside
+!			DummyDiffInMat(+1,:,:,:) = PipeConc(PointX,PointY-1:PointY+1,PointZ-1:PointZ+1,:,1)
+!		END IF
+!		IF (PipeArea(PointX,PointY-1) .EQV. .FALSE.) THEN					! is PointY-1 outside
+!			DummyDiffInMat(:,-1,:,:) = PipeConc(PointX-1:PointX+1,PointY,PointZ-1:PointZ+1,:,1)
+!		END IF
+!		IF (PipeArea(PointX,PointY+1) .EQV. .FALSE.) THEN					! is PointY+1 outside
+!			DummyDiffInMat(:,+1,:,:) = PipeConc(PointX-1:PointX+1,PointY,PointZ-1:PointZ+1,:,1)
+!		END IF
+!		IF (PointZ - 1 < 1) THEN								! are we at the start of the pipe
+!			DummyDiffInMat(:,:,PointZ-1,:) = PipeConc(PointX-1:PointX+1,PointY-1:PointY+1,PointZ,:,1)
+!		END IF
+!		IF (PointZ + 1 > NGridZ) THEN								! are we at the end of the pipe
+!			DummyDiffInMat(:,:,PointZ+1,:) = PipeConc(PointX-1:PointX+1,PointY-1:PointY+1,PointZ,:,1)
+!		END IF
+!! SAVED FOR HISTORY
 
-		! now testing if any of the relevant neighbouring points is outside an replace its values with the value of the center
+
+		DummyDiffInMat(0,0,0,:) = PipeConc(PointX,PointY,PointZ,:,1)
 		IF (PipeArea(PointX-1,PointY) .EQV. .FALSE.) THEN					! is PointX-1 outside
-			DummyDiffInMat(-1,:,:,:) = PipeConc(PointX,PointY-1:PointY+1,PointZ-1:PointZ+1,:,1)
+			DummyDiffInMat(-1,0,0,:) = PipeConc(PointX,PointY,PointZ,:,1)
+		ELSE											! or inside
+			DummyDiffInMat(-1,0,0,:) = PipeConc(PointX-1,PointY,PointZ,:,1)
 		END IF
 		IF (PipeArea(PointX+1,PointY) .EQV. .FALSE.) THEN					! is PointX+1 outside
-			DummyDiffInMat(+1,:,:,:) = PipeConc(PointX,PointY-1:PointY+1,PointZ-1:PointZ+1,:,1)
+			DummyDiffInMat(+1,0,0,:) = PipeConc(PointX,PointY,PointZ,:,1)
+		ELSE											! or inside
+			DummyDiffInMat(+1,0,0,:) = PipeConc(PointX+1,PointY,PointZ,:,1)
 		END IF
 		IF (PipeArea(PointX,PointY-1) .EQV. .FALSE.) THEN					! is PointY-1 outside
-			DummyDiffInMat(:,-1,:,:) = PipeConc(PointX-1:PointX+1,PointY,PointZ-1:PointZ+1,:,1)
+			DummyDiffInMat(0,-1,0,:) = PipeConc(PointX,PointY,PointZ,:,1)
+		ELSE											! or inside
+			DummyDiffInMat(0,-1,0,:) = PipeConc(PointX,PointY-1,PointZ,:,1)
 		END IF
 		IF (PipeArea(PointX,PointY+1) .EQV. .FALSE.) THEN					! is PointY+1 outside
-			DummyDiffInMat(:,+1,:,:) = PipeConc(PointX-1:PointX+1,PointY,PointZ-1:PointZ+1,:,1)
+			DummyDiffInMat(0,+1,0,:) = PipeConc(PointX,PointY,PointZ,:,1)
+		ELSE											! or inside
+			DummyDiffInMat(0,+1,0,:) = PipeConc(PointX,PointY+1,PointZ,:,1)
 		END IF
+
 		IF (PointZ - 1 < 1) THEN								! are we at the start of the pipe
-			DummyDiffInMat(:,:,PointZ-1,:) = PipeConc(PointX-1:PointX+1,PointY-1:PointY+1,PointZ,:,1)
+			DummyDiffInMat(0,0,-1,:) = PipeConc(PointX,PointY,PointZ,:,1)
+		ELSE
+			DummyDiffInMat(0,0,-1,:) = PipeConc(PointX,PointY,PointZ-1,:,1)
 		END IF
-		IF (PointZ + 1 > NGridZ) THEN								! are we at the end of the pipe
-			DummyDiffInMat(:,:,PointZ+1,:) = PipeConc(PointX-1:PointX+1,PointY-1:PointY+1,PointZ,:,1)
+		IF (PointZ + 1 > NGridZ) THEN
+			DummyDiffInMat(0,0,+1,:) = PipeConc(PointX,PointY,PointZ,:,1)
+		ELSE
+			DummyDiffInMat(0,0,+1,:) = PipeConc(PointX,PointY,PointZ+1,:,1)
 		END IF
+		
+
 
 		CALL DIFF_INT(DummyDiffInMat, DiffVec, DeltaConc)
 
 		DO lambda = 1, Omega
-                        PipeConc(PointX,PointY,PointZ,lambda,2) = DeltaConc(lambda) &
-                        + PipeConc(PointX,PointY,PointZ,lambda,2)                                       ! add changes in concetration due to diffusion to the changes in concentrations
+			PipeConc(PointX,PointY,PointZ,lambda,2) = DeltaConc(lambda) &
+			+ PipeConc(PointX,PointY,PointZ,lambda,2)                                       ! add changes in concetration due to diffusion to the changes in concentrations
                 END DO
 
 		DeltaConc = 0.0d0
 
-
+#ifdef openMPI
 	END DO												! stop iterate over points in Z	
+#else
+	END DO
+	!$OMP END DO
+	!$OMP BARRIER
+	!$OMP END PARALLEL
+#endif
 	END DO												! stop iterate over points in Y
 	END DO												! stop iterate over points in X
 
 
 	! MPI_SEND for all processes that are not root to send values in PipeConc(:,:,:,:,2) back to root
 	! Root thread sums them up and calculates new concentrations
+#ifdef openMPI
 	IF (ProcID == 0) THEN
 		DO IProc = 1, NProcs - 1
 			CALL MPI_RECV(LocConcChange, BCastSendCount, MPI_DOUBLE_PRECISION, &		! receive array with concentration changes of every thread
@@ -432,16 +514,21 @@ DO IntStep = 1, NSteps											! Integrate over time
 			CALL MPI_SEND(LocConcChange, BCastSendCount, MPI_DOUBLE_PRECISION, &		! send array with changes in concentrations to the root thread
 			0, GenericTag, MPI_COMM_WORLD, status, ierr)
 	END IF
+#endif
 
 	! calculating the concentrations for the new round by using the concentrations of this round and the concentration changes
+#ifdef openMPI
 	IF (ProcID == 0) THEN
+#endif
 		IF (InFlow .EQV. .TRUE.) THEN
 			PipeConc(:,:,2:,:,1) = PipeConc(:,:,2:,:,1) + PipeConc(:,:,2:,:,2)		! all except the inflow layer changes
 			PipeConc(:,:,1,:,1) = PipeConc(:,:,1,:,1)					! the inflow layer stays constant
 		ELSE
 			PipeConc(:,:,:,:,1) = PipeConc(:,:,:,:,1) + PipeConc(:,:,:,:,2)
 		END IF
+#ifdef openMPI
 	END IF
+#endif
 
 	!!//////////////!!
 	!! OUTPUT START !!
@@ -467,7 +554,11 @@ DO IntStep = 1, NSteps											! Integrate over time
 !	END IF
 
 	!! BINARY !!
+#ifdef openMPI
 	IF (ProcID == 0 .AND. MOD(IntStep, WriteInt) == 0) THEN						! write all 5 time steps outpu
+#else
+	IF (MOD(IntStep, WriteInt) == 0) THEN
+#endif
 		WRITE(202) PipeConc(:,:,:,:,1)								! write array to binary output
 	END IF	
 	!!//////////////!!
@@ -476,13 +567,16 @@ DO IntStep = 1, NSteps											! Integrate over time
 
 END DO													! end integrate over time
 
-
+#ifdef openMPI
 CALL MPI_FINALIZE(ierr)
+#endif
 
 !!//////////////!!
 !! OUTPUT START !!
 !!\\\\\\\\\\\\\\!!
+#ifdef openMPI
 IF (ProcID == 0) THEN
+#endif
 	CLOSE(UNIT=202)
 
 	WRITE(*, FMT='(/,/)')
@@ -490,7 +584,9 @@ IF (ProcID == 0) THEN
 	WRITE(*, *)
 	WRITE(*, 1001) "Leaving PIPE 3D EVOLVE now. Shutting down parallel computing. Bye!"
 	WRITE(*, 1001) "------------------------------------------------------------------"
+#ifdef openMPI
 END IF
+#endif
 !!//////////////!!
 !!  OUTPUT END  !!
 !!\\\\\\\\\\\\\\!!
