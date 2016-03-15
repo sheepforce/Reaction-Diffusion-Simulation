@@ -9,7 +9,7 @@ FFLAGS		= -fopenmp -cpp -O3 -march=native -mtune=native -funroll-loops -ffast-ma
 
 # Preprocessor variables
 # use MPI parallelitzation? Alternatively openMP will be used
-#FPPOPTIONS	= -DopenMPI=y		# use MPI parallelization
+#FPPOPTIONS	= -DopenMPI		# use MPI parallelization
 
 all: reform_conc test_pipe_3devolve test_rks_int
 

@@ -152,8 +152,6 @@ IF (method < 1 .OR. method > 2) THEN
         STOP 201
 END IF
 
-NUMTHREAD = 4
-
 
 !!//////////////!!
 !! OUTPUT START !!
@@ -361,7 +359,10 @@ DO IntStep = 1, NSteps											! Integrate over time
 #ifdef openMPI
 	DO PointZ = ProcID + 1, NGridZ, NProcs								! iterate over points in Z, distributed with MPI
 #else
-	!$OMP PARALLEL NUM_THREADS(NUMTHREAD)
+	!$OMP PARALLEL SHARED(PipeConc) PRIVATE(LocalConc, DeltaConc, DummyDiffInMat)
+
+!	DO PointZ = omp_get_thread_num() + 1, NGridZ, omp_get_num_threads()
+
 	!$OMP DO
 	DO PointZ = 1, NGridZ
 #endif
@@ -394,12 +395,6 @@ DO IntStep = 1, NSteps											! Integrate over time
 			LocalConc(2,:) = PipeConc(PointX,PointY,PointZ,:,1)				! concentration on current point in z
 		END IF
 		
-		!! DEBUG START
-!		FlowMat(PointX,PointY) = FLOW_PROFILE(PointX, PointY, vmax, vadd, NGridXY)		! AT THE MOMENT THIS IS NECESSARY, BECAUSE OF UNKNOWN REASON FlowMat IS BEEING
-													! CHANGED AT SOME INDIZES IN EVERY INTEGRATION STEP
-!		WRITE(*, *) PointX, PointY
-		!! DEBUG END
-
 		CALL FLOW_INT(LocalConc, LoopFlowMat(PointX,PointY), dTime, PipeLength, &		! calculates the changes in concentrations due to laminar flow
 		NGridZ, Omega, DeltaConc)
 
@@ -416,30 +411,6 @@ DO IntStep = 1, NSteps											! Integrate over time
 		!!!!!!!!!!!!!!!!
 
 		DummyDiffInMat = 0.0d0									! intialize dummy input for DIFF_INT, that will be adapted to constraints due to boundaries of the pipe
-!! SAVED FOR HISTORY
-!		DummyDiffInMat = PipeConc(PointX-1:PointX+1,PointY-1:PointY+1,PointZ-1:PointZ+1,:,1)	! if neighbouring points are not at the boundaries this is simply the corresponding segment of PipeConc
-!
-!		! now testing if any of the relevant neighbouring points is outside an replace its values with the value of the center
-!		IF (PipeArea(PointX-1,PointY) .EQV. .FALSE.) THEN					! is PointX-1 outside
-!			DummyDiffInMat(-1,:,:,:) = PipeConc(PointX,PointY-1:PointY+1,PointZ-1:PointZ+1,:,1)
-!		END IF
-!		IF (PipeArea(PointX+1,PointY) .EQV. .FALSE.) THEN					! is PointX+1 outside
-!			DummyDiffInMat(+1,:,:,:) = PipeConc(PointX,PointY-1:PointY+1,PointZ-1:PointZ+1,:,1)
-!		END IF
-!		IF (PipeArea(PointX,PointY-1) .EQV. .FALSE.) THEN					! is PointY-1 outside
-!			DummyDiffInMat(:,-1,:,:) = PipeConc(PointX-1:PointX+1,PointY,PointZ-1:PointZ+1,:,1)
-!		END IF
-!		IF (PipeArea(PointX,PointY+1) .EQV. .FALSE.) THEN					! is PointY+1 outside
-!			DummyDiffInMat(:,+1,:,:) = PipeConc(PointX-1:PointX+1,PointY,PointZ-1:PointZ+1,:,1)
-!		END IF
-!		IF (PointZ - 1 < 1) THEN								! are we at the start of the pipe
-!			DummyDiffInMat(:,:,PointZ-1,:) = PipeConc(PointX-1:PointX+1,PointY-1:PointY+1,PointZ,:,1)
-!		END IF
-!		IF (PointZ + 1 > NGridZ) THEN								! are we at the end of the pipe
-!			DummyDiffInMat(:,:,PointZ+1,:) = PipeConc(PointX-1:PointX+1,PointY-1:PointY+1,PointZ,:,1)
-!		END IF
-!! SAVED FOR HISTORY
-
 
 		DummyDiffInMat(0,0,0,:) = PipeConc(PointX,PointY,PointZ,:,1)
 		IF (PipeArea(PointX-1,PointY) .EQV. .FALSE.) THEN					! is PointX-1 outside
@@ -473,8 +444,6 @@ DO IntStep = 1, NSteps											! Integrate over time
 		ELSE
 			DummyDiffInMat(0,0,+1,:) = PipeConc(PointX,PointY,PointZ+1,:,1)
 		END IF
-		
-
 
 		CALL DIFF_INT(DummyDiffInMat, DiffVec, DeltaConc)
 
@@ -485,12 +454,12 @@ DO IntStep = 1, NSteps											! Integrate over time
 
 		DeltaConc = 0.0d0
 
+
 #ifdef openMPI
 	END DO												! stop iterate over points in Z	
 #else
 	END DO
 	!$OMP END DO
-	!$OMP BARRIER
 	!$OMP END PARALLEL
 #endif
 	END DO												! stop iterate over points in Y
