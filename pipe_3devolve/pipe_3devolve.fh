@@ -1,0 +1,89 @@
+!*EdMat         --> 2-dimensional array containing stoichiometric coefficients of the
+!               educts. first index are reactions, second substances
+!
+!*ProdMat       --> 2-dimensional array containing stoichiometric coefficients of the
+!               products. first index are reactions, second substances
+!
+!*RateVec       --> 1-dimensional array containing rate coefficients for every reaction
+!
+! Omega         --> number of substances, width of matrices EdMat, ProdMat and vector ConcVec
+!
+! N             --> number of reactions, height of matrices EdMat, ProdMat and vector RateVec
+!
+! I             --> serial number of iterators over reactions [1 ... N]
+!
+! lambda        --> serial number of iterators over substances [1 ... Omega]
+!
+! SubsNum       --> number of substance to calculate differential equation from.
+!               also from [1 ... Omega]
+!
+! StartTime     --> time at which to start the integration step
+!
+!*dTime         --> integration step length
+!
+!*Finaltime     --> time at which to stop integration
+!
+! NSteps        --> number of integration steps
+!
+! IntStep       --> serial number of integration [1 ... NSteps]
+!
+!*PipeLength	--> length of the pipe z = [0 ... l]
+!
+!*PipeRadius	--> radius of the pipe x = [-r, ... , 0 , ... , +r] and y = [-r, ... , 0 , ... , +r]
+!
+!*NGridXY	--> Number of points in x and y direction or in how many segments to split the radius
+!
+!*NgridZ	--> Number of points in z direction, calculated from PipeRadius, PipeLength and NGridXY
+!
+!*PipeConc	--> Array of type (2*NGridXY+1:2*NGridXY+1:INT(Pipelength/Piperadius/NGridXY):Omega:2)
+!
+!*vmax		--> maximum speed of flow in the middle of the pipe (laminar flow)
+!
+!*vadd		--> constant to be added to the flow at every point
+!
+! PointX/Y/Z	--> integer describing position on grid
+!
+! PipeArea	--> 2D Array in xy plane, containing logical values, telling you if you are inside or outside the pipe
+!
+!*method	--> numerical integration method
+!
+!*Inflow	--> is the concentration in the first xy plane constant == is there inflow of educts
+!
+! FlowMat	--> Matrix describing the flow speed in xy plane
+!
+! FLOW_PROFILE	--> value of function FLOW_PROFILE
+!
+! ZGridElementsMPI --> Number of points in z direction, that an MPI thread uses
+!
+! DeltaConc	--> intermediate vector, storing changes in concentrations after the subintegrations
+!
+! LocalConc	--> giving FLOW_INT a matrix where the previous points in z direction are previous point of PipeConc
+!
+! DummyDiffInMat --> giving DIFF_INT a matrix with adapted concentration values for calculating the laplacian
+!		with replaced concentrations outside the boundaries
+!
+!*DiffVec	--> vector containing diffusion constants, [1 ... Omega]
+!
+! LocConcChange	--> array storing the CHANGES in concentration at the end of integration step, necessary for MPI_RECV and MPI_SEND
+!
+
+INTEGER, DIMENSION(:,:), INTENT(IN) :: EdMat, ProdMat
+INTEGER, INTENT(IN) :: NGridXY, NgridZ, method
+REAL*8, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY,1:NGridZ,1:SIZE(EdMat,2),1:2) :: PipeConc
+REAL*8, DIMENSION(:), INTENT(IN) :: RateVec, DiffVec
+REAL*8, INTENT(IN) :: dTime, FinalTime, PipeLength, PipeRadius, vmax, vadd
+LOGICAL, INTENT(IN) :: InFlow
+REAL*8, DIMENSION(1:2,1:SIZE(EdMat,2)) :: LocalConc
+REAL*8, DIMENSION(-1:+1,-1:+1,-1:+1,SIZE(EdMat,2)) :: DummyDiffInMat
+REAL*8, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY,1:NGridZ,1:SIZE(EdMat,2)) :: LocConcChange
+
+INTEGER :: Omega, N, I, lambda, SubsNum, NSteps, IntStep, PointX, PointY, PointZ
+
+LOGICAL, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY) :: PipeArea
+REAL*8, DIMENSION(-NgridXY:+NgridXY,-NGridXY:+NGridXY) :: FlowMat
+REAL*8, DIMENSION(1:SIZE(EdMat,2)) :: DeltaConc
+REAL*8 :: FLOW_PROFILE
+
+REAL*8, PARAMETER :: StartTime = 0.0d0
+
+INTEGER :: NUMTHREAD
