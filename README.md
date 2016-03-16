@@ -1,2 +1,8 @@
 # Reaction-Diffusion-Simulation
-Simulation of diffusion-reaction network systems by numerical methods
+Simulating a reaction diffusion flow system in a cylindrical pipe on an equidistant rectangular grid.
+
+## Dependencies
+MPI2 (optional)
+openMP
+gfortran
+make
