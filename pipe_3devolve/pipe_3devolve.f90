@@ -151,6 +151,13 @@ IF (method < 1 .OR. method > 2) THEN
 	WRITE(*, *) "ERROR :  Requested not implemented integration method"
         STOP 201
 END IF
+IF(NgridZ /= NINT(PipeLength / (PipeRadius / NGridXY))) THEN
+	WRITE(*, *) "ERROR :  Grid is not equidistant, NridZ is wrong"
+	STOP 202
+END IF
+
+ALLOCATE(DiffVecGrid(SIZE(DiffVec)))
+DiffVecGrid = DiffVec / ((PipeLength / NGridZ) ** 2)							! Rescale DiffVec values from m^2/s to GridPoints^2/s
 
 
 !!//////////////!!
@@ -445,7 +452,7 @@ DO IntStep = 1, NSteps											! Integrate over time
 			DummyDiffInMat(0,0,+1,:) = PipeConc(PointX,PointY,PointZ+1,:,1)
 		END IF
 
-		CALL DIFF_INT(DummyDiffInMat, DiffVec, DeltaConc)
+		CALL DIFF_INT(DummyDiffInMat, DiffVecGrid, DeltaConc)
 
 		DO lambda = 1, Omega
 			PipeConc(PointX,PointY,PointZ,lambda,2) = DeltaConc(lambda) &
@@ -535,6 +542,8 @@ DO IntStep = 1, NSteps											! Integrate over time
 	!!\\\\\\\\\\\\\\!!
 
 END DO													! end integrate over time
+
+DEALLOCATE(DiffVecGrid)
 
 #ifdef openMPI
 CALL MPI_FINALIZE(ierr)

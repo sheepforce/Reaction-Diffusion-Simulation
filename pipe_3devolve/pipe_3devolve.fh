@@ -64,6 +64,8 @@
 !
 !*DiffVec	--> vector containing diffusion constants, [1 ... Omega]
 !
+! DiffVecGrid	--> vector containing diffusion constants, [1 ... Omega] in Gridpoints^2 / s
+!
 ! LocConcChange	--> array storing the CHANGES in concentration at the end of integration step, necessary for MPI_RECV and MPI_SEND
 !
 
@@ -71,6 +73,7 @@ INTEGER, DIMENSION(:,:), INTENT(IN) :: EdMat, ProdMat
 INTEGER, INTENT(IN) :: NGridXY, NgridZ, method
 REAL*8, DIMENSION(-NGridXY:+NGridXY,-NGridXY:+NGridXY,1:NGridZ,1:SIZE(EdMat,2),1:2) :: PipeConc
 REAL*8, DIMENSION(:), INTENT(IN) :: RateVec, DiffVec
+REAL*8, DIMENSION(:), ALLOCATABLE :: DiffVecGrid
 REAL*8, INTENT(IN) :: dTime, FinalTime, PipeLength, PipeRadius, vmax, vadd
 LOGICAL, INTENT(IN) :: InFlow
 REAL*8, DIMENSION(1:2,1:SIZE(EdMat,2)) :: LocalConc
