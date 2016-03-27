@@ -33,6 +33,7 @@ routines:
 reform_conc:
 	$(FC) $(FFLAGS) reform_concH.f90 -o reform_concH.bin
 	$(FC) $(FFLAGS) reform_concP.f90 -o reform_concP.bin
+	$(FC) $(FFLAGS) reform_concM.f90 -o reform_concM.bin
 
 clean:
 	rm *.o
