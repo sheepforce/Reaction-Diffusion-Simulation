@@ -41,10 +41,8 @@ END DO
 
 DO IntStep = WriteInt, NSteps, WriteInt
 	READ(100) PipeWrite
-	WRITE(IntName, FMT='(I0)') IntStep
 
 	DO lambda = 1, Omega
-		WRITE(SubsName, FMT='(I0)') lambda
 		UOpen = lambda + 200
 
 		IF (IntStep == WriteInt) THEN
@@ -62,7 +60,6 @@ DO IntStep = WriteInt, NSteps, WriteInt
 				END DO
 			END DO
 		END DO
-		CLOSE(UNIT=202)
 	END DO
 END DO
 

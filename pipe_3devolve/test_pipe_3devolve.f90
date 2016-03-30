@@ -27,10 +27,10 @@ WRITE(*, *) "================================="
 WRITE(*, *)
 WRITE(*, *) "Initializing variables now"
 
-NGridXY = 2
+NGridXY = 5
 vmax = 5.0d-4
 vadd = 1.0d-4
-PipeLength = 1.0d-1
+PipeLength = 1.0d0
 PipeRadius = 1.0d-2
 dTime = 1.0d-3
 FinalTime = 5.0d0
