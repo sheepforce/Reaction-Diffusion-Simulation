@@ -29,44 +29,40 @@ ALLOCATE(PipeWrite(-NGridXY:NGridXY,-NGridXY:+NGridXY,NgridZ,Omega))
 PipeWrite = 0.0d0
 
 
-OPEN(UNIT=101, FILE='Index.dat')
-WRITE(101, FMT='(A10, A10, A10, A10)') "X", "Y", "Z", "IntStep"
-
-DO IntStep =  WriteInt, NSteps, WriteInt
-	DO PointX = -NGridXY, +NGridXY
-		DO PointY = -NGridXY, +NGridXY
-			DO PointZ = 1, NGridZ
-				WRITE(101, FMT='(I10, I10, I10, I10)') IntStep, PointX, PointY, PointZ
-			END DO
-		END DO
-	END DO
-END DO
-
-CLOSE(UNIT=101)
+CALL SYSTEM('mkdir -p out')
 
 
 DO lambda = 1, Omega
 	UOpen = 200 + lambda
 	WRITE(SubsName, FMT='(I0)') lambda
-	OPEN(UNIT=Uopen, FILE="Subs"//TRIM(SubsName)//".dat")
+	OPEN(UNIT=Uopen, FILE="out/Subs"//TRIM(SubsName)//".dat")
 END DO
 
 
 DO IntStep = WriteInt, NSteps, WriteInt
-READ(100) PipeWrite
-WRITE(IntName, FMT='(I0)') IntStep
+	READ(100) PipeWrite
+	WRITE(IntName, FMT='(I0)') IntStep
 
-	DO PointX = -NGridXY, +NGridXY
-		DO PointY = -NGridXY, +NGridXY
-			DO PointZ = 1, NGridZ
-				DO lambda = 1, Omega
-					WRITE(SubsName, FMT='(I0)') lambda
-					UOpen = lambda + 200
+	DO lambda = 1, Omega
+		WRITE(SubsName, FMT='(I0)') lambda
+		UOpen = lambda + 200
 
-					WRITE(Uopen, *) PipeWrite(PointX,PointY,PointZ,lambda)
+		IF (IntStep == WriteInt) THEN
+			WRITE(UOpen, *) "Steps output :", NSteps / WriteInt
+			WRITE(UOpen, *) "X            :", NGridXY * 2 + 1
+			WRITE(UOpen, *) "Y            :", NGridXY * 2 + 1
+			WRITE(UOpen, *) "Z            :", NGridZ
+			WRITE(UOpen, *)
+		END IF
+
+		DO PointX = -NgridXY, +NGridXY
+			DO PointY = -NgridXY, +NgridXY
+				DO PointZ = 1, NGridZ
+					WRITE(UOpen, *) PipeWrite(PointX,PointY,PointZ,lambda)
 				END DO
 			END DO
 		END DO
+		CLOSE(UNIT=202)
 	END DO
 END DO
 
