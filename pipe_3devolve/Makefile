@@ -23,6 +23,8 @@ test_rks_solv: rks_solv
 
 pipe_3devolve: routines
 	$(FC) $(FFLAGS) $(FPPOPTIONS) -c pipe_3devolve.f90
+	$(FC) $(FFLAGS) $(FPPOPTIONS) -c init_pipe_3devolve.f90
+	$(FC) $(FFLAGS) $(FPPOPTIONS) flow_profile.o find_pipe.o pipe_3devolve.o rks_int.o rks_rhs_ode.o flow_int.o laplacian.o diff_int.o rks_rk4int.o init_pipe_3devolve.o -o pipe_3devolve.bin
 
 rks_solv: routines
 	$(FC) $(FFLAGS) $(FPPOPTIONS) -c rks_solv.f90
