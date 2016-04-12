@@ -48,14 +48,15 @@ if __name__ == "__main__":
         exit()
     print("Done. Start parsing starting concentrations.")       
     
-    
-    
-    try:                                                                    #Anfangskonzentrationen parsen
-       parseConcentrations = ConcentrationParser(parseReactions.getSubVec(), makeBlocks.getConcentrations())
-    except Exception:
-        print ("Error while parsing data. Check your starting concentrations in the input file.")
-        raw_input("Press ENTER to exit program.")
-        exit()
+    concentrations = []
+    #try:                                                                    #Anfangskonzentrationen parsen
+    for i in xrange(len(parseReactions.getSubVec())):
+        print(parseReactions.getSubVec()[i], makeBlocks.getConcentrations()[0], int(makeBlocks.getPipeRadius()[0]), int(makeBlocks.getZGrid()[0]))
+        concentrations.append(ConcentrationParser.parse(parseReactions.getSubVec()[i], makeBlocks.getConcentrations()[0], int(makeBlocks.getPipeRadius()[0]), int(makeBlocks.getZGrid()[0])))
+   # except Exception:
+    #    print ("Error while parsing data. Check your starting concentrations in the input file.")
+     #   raw_input("Press ENTER to exit program.")
+    #    exit()
     print("Done. Start something else...")  
     
     
@@ -84,7 +85,7 @@ if __name__ == "__main__":
     print ("")
     print("Anfangskonzentrationen:")
     print (parseReactions.getSubVec())
-    print (parseConcentrations.getConVec())
+    print (concentrations)
     print("")
     print("Anfangsgeschwindigkeiten:")
     i = 0 

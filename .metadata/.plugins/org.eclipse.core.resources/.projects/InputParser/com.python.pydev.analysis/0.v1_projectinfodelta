@@ -1,0 +1,12 @@
+INSTUPMain
+/home/max/Reaction-Diffusion-Simulation/InputParser/Main.py
+INFOS:&&3|1|2|0&&3|3|2|0&&3|4|2|0&&3|4|2|0&&3|5|2|0&&3|6|2|0&&3|7|2|0&&3|8|2|0&&3|9|2|0&&3|9|2|0&&3|9|2|0
+parseReactions=7
+Main=2
+sourceFile=5
+source=4
+args=3
+concentrations=8
+makeBlocks=6
+i=9
+options=1

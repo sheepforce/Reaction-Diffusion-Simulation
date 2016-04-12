@@ -9,7 +9,7 @@ Created on 22.01.2016
 class BlockGenerator:
    
     commentTag = "//"
-    startTags = ["***reactions", "***startingconcentrations", "***reactionrateconstants", "***integrationmethod", "***integrationstepwidth"]
+    startTags = ["***reactions", "***concFileRepository", "***reactionrateconstants", "***integrationmethod", "***integrationstepwidth", "***zgrid", "***xygridradius"]
     endTag = "***end"
     clean = []
     foundBlocks = []
@@ -19,13 +19,13 @@ class BlockGenerator:
     def __init__(self, sourceFile):
         self.clean = self.cleanData(sourceFile)     #entferne stoerende Zeilen aus den Rohdaten
         self.generateBlocks()
-        completedata = "***reactions" in self.foundBlocks and "***startingconcentrations" in self.foundBlocks and "***reactionrateconstants" in self.foundBlocks 
+        completedata = "***reactions" in self.foundBlocks and "***concFileRepository" in self.foundBlocks and "***reactionrateconstants" in self.foundBlocks 
         self.minimumInfo = completedata and len(self.blocks[self.foundBlocks.index("***reactions")]) == len(self.blocks[self.foundBlocks.index("***reactionrateconstants")])
     
     def cleanData(self, data):
         i = 0
         while i < len(data):
-            data[i] = data[i].replace(" ","") #entferne saemtliche Leerzeichen aus der Reaktionsgleichung
+            data[i] = data[i].replace(" ","") #entferne saemtliche Leerzeichen
             data[i] = data[i].replace("\n","")#entferne Zeilenumbrueche
             if data[i][0:len(self.commentTag)] == self.commentTag:  #mache Kommentare zu Leerzeilen
                 data[i] = "" 
@@ -53,8 +53,16 @@ class BlockGenerator:
         return self.blocks[self.foundBlocks.index("***reactions")]  
     
     def getConcentrations(self):
-        return self.blocks[self.foundBlocks.index("***startingconcentrations")]  
+        return self.blocks[self.foundBlocks.index("***concFileRepository")]  
     
     def getRateConstants(self):
-        return self.blocks[self.foundBlocks.index("***reactionrateconstants")]                    
+        return self.blocks[self.foundBlocks.index("***reactionrateconstants")]    
+    
+    def getPipeRadius(self):
+        return self.blocks[self.foundBlocks.index("***xygridradius")]      
+    
+    def getZGrid(self):
+        return self.blocks[self.foundBlocks.index("***zgrid")]     
+    
+    
        

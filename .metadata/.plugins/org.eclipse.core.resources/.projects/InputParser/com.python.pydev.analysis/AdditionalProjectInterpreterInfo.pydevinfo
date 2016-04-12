@@ -1,0 +1,52 @@
+-- VERSION_4
+-- START DISKCACHE_2
+/home/max/Reaction-Diffusion-Simulation/.metadata/.plugins/org.eclipse.core.resources/.projects/InputParser/com.python.pydev.analysis/v2_indexcache
+Data.ConcentrationParser|1460471117000000000|/home/max/Reaction-Diffusion-Simulation/InputParser/Data/ConcentrationParser.py
+Data.__init__|1460452681000000000|/home/max/Reaction-Diffusion-Simulation/InputParser/Data/__init__.py
+Data.ReactionParser|1460452681000000000|/home/max/Reaction-Diffusion-Simulation/InputParser/Data/ReactionParser.py
+Data.Interface|1460452681000000000|/home/max/Reaction-Diffusion-Simulation/InputParser/Data/Interface.py
+Data.BlockGenerator|1460469247000000000|/home/max/Reaction-Diffusion-Simulation/InputParser/Data/BlockGenerator.py
+-- END DISKCACHE
+-- START DICTIONARY
+7
+2=Data.ConcentrationParser
+5=ConcentrationParser
+3=Data.ReactionParser
+1=Data.BlockGenerator
+6=BlockGenerator
+4=ReactionParser
+7=BlockGenerator.__init__
+-- END DICTIONARY
+-- START TREE 1
+9
+arg|0|
+blo|1|BlockGenerator!9@
+con|1|ConcentrationParser!17@
+i|0|
+mak|0|
+opt|0|
+par|0|
+rea|1|ReactionParser!25@
+sou|0|
+-- END TREE
+-- START TREE 2
+18
+__i|3|__init__!4&26@__init__!5&18@__init__!6&10@
+add|0|
+adj|1|adjustLengthOfReactandMatrices!4&26@
+blo|1|blocks!6&11@
+cle|3|clean!7&11@clean!6&11@cleanData!6&10@
+com|1|commentTag!6&11@
+con|0|
+edu|1|eduMat!4&27@
+end|1|endTag!6&11@
+fou|1|foundBlocks!6&11@
+gen|2|generateCoeVec!4&26@generateBlocks!6&10@
+get|8|getReactions!6&10@getZGrid!6&10@getRateConstants!6&10@getConcentrations!6&10@getSubVec!4&26@getEduMat!4&26@getProMat!4&26@getPipeRadius!6&10@
+min|2|minimumInfo!7&11@minimumInfo!6&11@
+par|2|parseLine!4&26@parse!5&18@
+pro|1|proMat!4&27@
+rea|1|reactionArrow!4&27@
+sta|1|startTags!6&11@
+sub|3|subOffTag!4&27@subVec!4&27@subTag!4&27@
+-- END TREE

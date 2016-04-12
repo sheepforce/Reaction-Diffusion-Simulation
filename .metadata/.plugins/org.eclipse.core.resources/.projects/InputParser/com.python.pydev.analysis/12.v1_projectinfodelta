@@ -1,0 +1,7 @@
+INSTUPData.ConcentrationParser
+/home/max/Reaction-Diffusion-Simulation/InputParser/Data/ConcentrationParser.py
+INFOS:&&1|1|2|0&&2|3|2|1&&2|4|2|1
+__init__=3
+Data.ConcentrationParser=2
+ConcentrationParser=1
+parse=4

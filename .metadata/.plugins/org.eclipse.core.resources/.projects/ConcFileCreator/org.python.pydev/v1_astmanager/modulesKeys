@@ -1,0 +1,5 @@
+MODULES_MANAGER_V2
+Data.Calc|/home/max/Reaction-Diffusion-Simulation/ConcFileCreator/Data/Calc.py
+Data.GUI|/home/max/Reaction-Diffusion-Simulation/ConcFileCreator/Data/GUI.py
+Data.__init__|/home/max/Reaction-Diffusion-Simulation/ConcFileCreator/Data/__init__.py
+Main|/home/max/Reaction-Diffusion-Simulation/ConcFileCreator/Main.py

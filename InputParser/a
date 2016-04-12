@@ -1,0 +1,29 @@
+//Testdatei für inputfile-Leseprogramm
+
+
+***reactions
+{test} -> {a}+{test2}
+***end
+
+***reaction rate constants
+23
+***end
+
+***zgrid
+2
+***end
+
+***xygridradius
+1
+***end
+
+***concFileRepository
+/home/max/
+***end
+
+***integrationsteps
+
+
+
+
+

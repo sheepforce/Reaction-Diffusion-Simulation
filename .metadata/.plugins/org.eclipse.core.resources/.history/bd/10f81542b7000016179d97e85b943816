@@ -1,0 +1,38 @@
+'''
+Created on 22.01.2016
+
+@author: maximilian
+'''
+
+class ConcentrationParser():
+
+    def __init__(self):
+        pass
+        
+    @staticmethod
+    def parse(self, subs, consRepPath, r, z):
+        ret = []
+        i = 1
+        try:
+            import fileinput   
+            for line in fileinput.input([consRepPath + subs + '.dat']):
+                if i == 1:
+                    print("reading data from" + consRepPath + subs + ".dat")
+                    steps = int(line.replace(" ","").replace("Stepsoutput:", ""))
+                if i > 5 + r * z * (steps-1):
+                    ret.append(line)
+                    print("progress:" + str((i-5)/steps*100) + " percent")
+                i+=1
+        except Exception:
+            print("no concentration data found for " + subs + ", using default")
+            for i in xrange(r * z):
+                ret.append(0)
+                print("progress:" + str((i-5)/steps*100) + " percent")
+        print(ret)
+        return ret
+    
+    
+            
+                
+                        
+ 
