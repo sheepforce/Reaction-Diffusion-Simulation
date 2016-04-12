@@ -1,0 +1,45 @@
+//Testdatei für inputfile-Leseprogramm
+
+
+***reactions
+//Das ist ein Kommentar innerhalb eines Blocks
+{A} + 2 {B} + 3 {C} -> 1 {D} + 4 {B} + 5 {C} 
+
+  /   /  Leerzeichen und Leerzeilen spielen keine Rolle. Das hier ist immernoch ein Kommentar.
+  
+ 1 {A} +         7 {C}  + 5 {D} -> 6{E} + 4 {B} + 1 {D}
+ 
+                           ->      {A} + 4 {B}         + 5  {D} 
+                           
+                           // Die Namen der Pro- und Edukte können alle Zeichen beinhalten außer } und müssen mit { eingeleitet und  mit } abgeschlossen werden.
+                           // Die Wahl der jeweiligen Zeichen (also {, }, //, etc.) ist sehr leicht zu ändern.
+                           
+1{A}+7{C}+5{D}->6{A}+4{B}  
+
+//Wie Gleichungen 3 und 5 zeigen muss vor oder nach dem Reaktionspfeil nichts stehen.
+5{C}+7  {E}->
+***end
+
+Das ist ein Kommentar außerhalb eines Blocks, der Speicher braucht.
+//Das ist auch ein Kommentar außerhalb eines Blocks, der keinen Speicher braucht, weil er gelöscht wird.
+
+
+***starting concentrations
+1.0 {A}
+0.5 {C}
+0.1 {D}
+***end
+
+//Reaktionsratenkonstante sind noch nicht weiter implementiert, sondern werden nur als Block eingelesen.
+***reaction rate constants
+23
+7
+26
+34
+21
+***end
+
+
+
+
+
