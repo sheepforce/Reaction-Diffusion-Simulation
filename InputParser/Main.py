@@ -9,6 +9,7 @@ from Data.ConcentrationParser import ConcentrationParser
 import argparse
 
 if __name__ == "__main__":
+    fortranInput = ""
     options = argparse.ArgumentParser()
     options.add_argument("-f","--file", help="enter inputfile (path)")
     args = options.parse_args()
@@ -33,34 +34,62 @@ if __name__ == "__main__":
         print ("Error while analyzing data. Is an input block without end tag?")
         raw_input("Press ENTER to exit program.")
         exit()
-    print ("Done. Checking minimum information...")
-    if not makeBlocks.minimumInfo:
-        print ("Not enough data given. Make sure to have one rate constant for each reaction and at least the blocks ***reactions, ***reaction rate constants and ***starting concentrations")
-        raw_input("Press ENTER to exit program.")
-        exit()
-    print ("Done. Start parsing reactions.")
+    
+    if "***pathToExistingFortranInput" in makeBlocks.foundBlocks:
+        fortranInput = makeBlocks.getBlockByName("***pathToExistingFortranInput")[0]
+        print("Done. Using probably existing fortran input.")
+    else:
+        print ("Done. Checking minimum information...")
+        if not makeBlocks.minimumInfo:
+            print ("Not enough data given. Make sure to have one rate constant for each reaction and at least the blocks ***reactions, ***reaction rate constants and ***starting concentrations")
+            raw_input("Press ENTER to exit program.")
+            exit()
+        print ("Done. Start parsing reactions.")
        
-    try:                                                                    #Reaktionsgleichungen parsen
-        parseReactions = ReactionParser(makeBlocks.getReactions())
-    except Exception:
-        print ("Error while parsing data. Check your reaction-equations in the input file.")
-        raw_input("Press ENTER to exit program.")
-        exit()
-    print("Done. Start parsing starting concentrations.")       
+        try:                                                                    #Reaktionsgleichungen parsen
+            parseReactions = ReactionParser(makeBlocks.getBlockByName("***reactions"))
+        except Exception:
+            print ("Error while parsing data. Check your reaction-equations in the input file.")
+            raw_input("Press ENTER to exit program.")
+            exit()
+        print("Done. Start parsing starting concentrations.")       
     
-    concentrations = []
-    #try:                                                                    #Anfangskonzentrationen parsen
-    for i in xrange(len(parseReactions.getSubVec())):
-        print(parseReactions.getSubVec()[i], makeBlocks.getConcentrations()[0], int(makeBlocks.getPipeRadius()[0]), int(makeBlocks.getZGrid()[0]))
-        concentrations.append(ConcentrationParser.parse(parseReactions.getSubVec()[i], makeBlocks.getConcentrations()[0], int(makeBlocks.getPipeRadius()[0]), int(makeBlocks.getZGrid()[0])))
-   # except Exception:
-    #    print ("Error while parsing data. Check your starting concentrations in the input file.")
-     #   raw_input("Press ENTER to exit program.")
-    #    exit()
-    print("Done. Start something else...")  
+        concentrations = []                                                  #Anfangskonzentrationen parsen
+        for i in xrange(len(parseReactions.getSubVec())):
+            concentrations.append(ConcentrationParser.parse(parseReactions.getSubVec()[i], makeBlocks.getConcentrations()[0], int(makeBlocks.getBlockByName("***zgrid")[0]), int(makeBlocks.getBlockByName("***zgrid")[0])))
+        print("Done. Start generating input for simulation program.")  
     
+        #Generierung des inputfile fuer fortran
+        #pipeLength
+        out = str('%e' % float(makeBlocks.getBlockByName("***pipeLength")[0])).replace("e", "d").replace("+","")
+        if out[out.index("d")+1] == "0" and out[out.index("d")+1] != "-":
+            print(out[:out.index("d")+1] + out[out.index("d")+2:] + " ! pipeLength")
+        elif out[out.find("d-")+2] == "0":
+            print(out[:out.index("d")+2] + out[out.index("d")+3:] + " ! pipeLength")
+        else:
+            print(out + " ! pipeLength")
     
-    
+        #pipeRadius
+        out = str('%e' % float(makeBlocks.getBlockByName("***pipeRadius")[0])).replace("e", "d").replace("+","")
+        if out[out.index("d")+1] == "0" and out[out.index("d")+1] != "-":
+            print(out[:out.index("d")+1] + out[out.index("d")+2:] + " ! pipeRadius")
+        elif out[out.find("d-")+2] == "0":
+            print(out[:out.index("d")+2] + out[out.index("d")+3:] + " ! pipeRadius")
+        else:
+            print(out + " ! pipeRadius")
+            
+        #xygridradius, int
+        
+        #zgrid, int
+        
+        #flowSpeed
+        
+        #linearFlowSpeed
+        
+        #integrationStepwidth
+        
+        #
+            
     
     
     #Ausgabe zu Testzwecken. Man sieht ja sonst nichts...
@@ -89,8 +118,8 @@ if __name__ == "__main__":
     print("")
     print("Anfangsgeschwindigkeiten:")
     i = 0 
-    while i < len(makeBlocks.getRateConstants()):
-        print (str(i+1)+ " "+ makeBlocks.getRateConstants()[i])
+    while i < len(makeBlocks.getBlockByName("***reactionRateConstants")):
+        print (str(i+1)+ " "+ makeBlocks.getBlockByName("***reactionRateConstants")[i])
         i += 1    
         
         

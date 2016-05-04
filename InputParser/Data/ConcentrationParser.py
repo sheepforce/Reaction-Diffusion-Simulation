@@ -14,6 +14,8 @@ class ConcentrationParser():
         ret = []
         i = 1
         try:
+            if consRepPath == "":
+                raise Exception
             import fileinput  
             for line in fileinput.input([consRepPath + subs + '.dat']):
                 if i == 1:
@@ -21,14 +23,12 @@ class ConcentrationParser():
                     steps = int(line.replace(" ","").replace("Stepsoutput:", ""))
                 if i > 5 + (2*r+1)*(2*r+1)*z *(steps-1):
                     ret.append(line.replace("\n",""))
-                    print("progress:" + str((float(i)-5)/((2*r+1)*(2*r+1)*z)*100) + " percent")
                 i+=1
         except Exception:
             print("no concentration data found for " + subs + ", using default")
             for i in xrange((2*r+1)*(2*r+1)*z):
                 ret.append("0")
-                print("progress:" + str((float(i))/((2*r+1)*(2*r+1)*z)*100) + " percent")
-        print(ret)
+        print("parsing of " + subs + "s starting concentration finished")
         return ret
     
     

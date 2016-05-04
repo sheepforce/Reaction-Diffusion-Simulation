@@ -9,7 +9,22 @@ Created on 22.01.2016
 class BlockGenerator:
    
     commentTag = "//"
-    startTags = ["***reactions", "***concFileRepository", "***reactionrateconstants", "***integrationmethod", "***integrationstepwidth", "***zgrid", "***xygridradius"]
+    startTags = ["***useExistingFortranInput",
+                 "***zgrid",
+                 "***xygridradius",
+                 "***reactions",
+                 "***reactionRateConstants",
+                 "***diffusionCoefficients",
+                 "***inflow",
+                 "***flowSpeed",
+                 "***integrationStepwidth",
+                 "***integrationIntervall",
+                 "***concFileRepository",
+                 "***pipeLength",
+                 "***pipeRadius",
+                 "***integrationmethod",
+                 "***linearFlowSpeed"
+                 ]
     endTag = "***end"
     clean = []
     foundBlocks = []
@@ -19,8 +34,8 @@ class BlockGenerator:
     def __init__(self, sourceFile):
         self.clean = self.cleanData(sourceFile)     #entferne stoerende Zeilen aus den Rohdaten
         self.generateBlocks()
-        completedata = "***reactions" in self.foundBlocks and "***concFileRepository" in self.foundBlocks and "***reactionrateconstants" in self.foundBlocks 
-        self.minimumInfo = completedata and len(self.blocks[self.foundBlocks.index("***reactions")]) == len(self.blocks[self.foundBlocks.index("***reactionrateconstants")])
+        completedata = "***reactions" in self.foundBlocks and "***reactionRateConstants" in self.foundBlocks 
+        self.minimumInfo = completedata and len(self.blocks[self.foundBlocks.index("***reactions")]) == len(self.blocks[self.foundBlocks.index("***reactionRateConstants")])
     
     def cleanData(self, data):
         i = 0
@@ -48,21 +63,17 @@ class BlockGenerator:
                 storage = []                                # dann setze den storage zurueck
             i += 1
     
-   
-    def getReactions(self):
-        return self.blocks[self.foundBlocks.index("***reactions")]  
-    
     def getConcentrations(self):
-        return self.blocks[self.foundBlocks.index("***concFileRepository")]  
+        if "***concFileRepository" in self.foundBlocks:
+            return self.blocks[self.foundBlocks.index("***concFileRepository")]  
+        else:
+            return [""]
+
+    def getBlockByName(self, name):
+        return self.blocks[self.foundBlocks.index(name)]
     
-    def getRateConstants(self):
-        return self.blocks[self.foundBlocks.index("***reactionrateconstants")]    
     
-    def getPipeRadius(self):
-        return self.blocks[self.foundBlocks.index("***xygridradius")]      
-    
-    def getZGrid(self):
-        return self.blocks[self.foundBlocks.index("***zgrid")]     
+ 
     
     
        

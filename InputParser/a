@@ -1,12 +1,21 @@
 //Testdatei für inputfile-Leseprogramm
 
+//Flag für Einsatz bereits existierendes Fortran-inputfile, optional
+//***pathToExistingFortranInput
 
-***reactions
-{test} -> {a}+{test2}
+//***
+
+//verpflichtende Felder:
+
+//Informationen über das Rohr
+//reale Länge des Rohrs
+***pipeLength
+0.0000000000000000000000000000012356
 ***end
 
-***reaction rate constants
-23
+//realer Radius des Rohrs
+***pipeRadius
+0.45
 ***end
 
 ***zgrid
@@ -17,13 +26,54 @@
 1
 ***end
 
-***concFileRepository
-/home/max/
+//Reaktionen mit zugehörigen Ratenkonstanten
+***reactions
+{test} -> {a}+{test2}
 ***end
 
-***integrationsteps
+***reactionRateConstants
+23
+***end
+
+***diffusionCoefficients
+substance value
+***end
+
+//Zufluss ins Rohr; erste Schicht ist konstant
+***inflow
+true
+***end
+
+//maximale Strömungsgeschwindigkeit
+***flowSpeed
+
+***
+
+//Integrationsparameter
+//Integrationsschrittweite (in Sekunden)
+***integrationStepwidth
+
+***end
+
+//Integrationsdauer (in Sekunden)
+***integrationIntervall
+
+***
 
 
+//optionale Felder:
+//Verzeichnis, in dem Konzentrationsdateien liegen
+***concFileRepository
+/path/to/repository/
+***end
 
+//Integrationsmethode
+***integrationmethod
 
+***end
+
+//additive lineare Strömungsgeschwindigkeit
+***linearFlowSpeed
+
+***end
 
