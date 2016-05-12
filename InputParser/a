@@ -1,13 +1,15 @@
 //Testdatei für inputfile-Leseprogramm
 
+//Kommandozeilenbefehl zur parallelen Ausfürhung des FORTRAN-Programms
+***exec
+kate
+***end
+
 //Flag für Einsatz bereits existierendes Fortran-inputfile, optional
 //***pathToExistingFortranInput
 
-//***
+//***end
 
-//verpflichtende Felder:
-
-//Informationen über das Rohr
 //reale Länge des Rohrs
 ***pipeLength
 0.0000000000000000000000000000012356
@@ -28,11 +30,13 @@
 
 //Reaktionen mit zugehörigen Ratenkonstanten
 ***reactions
-{test} -> {a}+{test2}
+1{test} -> 2{a}+3{test2}
+1{test} -> 2{a}+3{test2}
 ***end
 
 ***reactionRateConstants
 23
+1
 ***end
 
 ***diffusionCoefficients
@@ -46,22 +50,19 @@ true
 
 //maximale Strömungsgeschwindigkeit
 ***flowSpeed
+1.52
+***end
 
-***
-
-//Integrationsparameter
 //Integrationsschrittweite (in Sekunden)
 ***integrationStepwidth
-
+10
 ***end
 
 //Integrationsdauer (in Sekunden)
 ***integrationIntervall
+1232
+***end
 
-***
-
-
-//optionale Felder:
 //Verzeichnis, in dem Konzentrationsdateien liegen
 ***concFileRepository
 /path/to/repository/
@@ -69,11 +70,11 @@ true
 
 //Integrationsmethode
 ***integrationmethod
-
+1
 ***end
 
 //additive lineare Strömungsgeschwindigkeit
 ***linearFlowSpeed
-
+1
 ***end
 

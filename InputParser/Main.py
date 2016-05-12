@@ -3,10 +3,14 @@ Created on 22.01.2016
 
 @author: maximilian
 '''
+from __future__ import print_function
 from Data.ReactionParser import ReactionParser
 from Data.BlockGenerator import BlockGenerator
 from Data.ConcentrationParser import ConcentrationParser
+
+
 import argparse
+import os
 
 if __name__ == "__main__":
     fortranInput = ""
@@ -20,7 +24,7 @@ if __name__ == "__main__":
         source = raw_input("Enter path of inputfile:")
     print ("Reading inputfile...")
     
-    try:                                                                    #inpufile einlesen
+    try:                                                                    #inputfile einlesen
         sourceFile = open(source).readlines()
     except Exception:
         print ("Error while reading inputfile. File not existing?")
@@ -58,69 +62,96 @@ if __name__ == "__main__":
         for i in xrange(len(parseReactions.getSubVec())):
             concentrations.append(ConcentrationParser.parse(parseReactions.getSubVec()[i], makeBlocks.getConcentrations()[0], int(makeBlocks.getBlockByName("***zgrid")[0]), int(makeBlocks.getBlockByName("***zgrid")[0])))
         print("Done. Start generating input for simulation program.")  
+        
+        FORTRAN = open(source + ".dat", "w")
+        
     
         #Generierung des inputfile fuer fortran
         #pipeLength
         out = str('%e' % float(makeBlocks.getBlockByName("***pipeLength")[0])).replace("e", "d").replace("+","")
-        if out[out.index("d")+1] == "0" and out[out.index("d")+1] != "-":
-            print(out[:out.index("d")+1] + out[out.index("d")+2:] + " ! pipeLength")
-        elif out[out.find("d-")+2] == "0":
-            print(out[:out.index("d")+2] + out[out.index("d")+3:] + " ! pipeLength")
-        else:
-            print(out + " ! pipeLength")
+        print(out + " ! pipeLength", file = FORTRAN)
+        #if out[out.index("d")+1] == "0" and out[out.index("d")+1] != "-":
+        #    print(out[:out.index("d")+1] + out[out.index("d")+2:] + " ! pipeLength")
+        #elif out[out.find("d-")+2] == "0":
+        #    print(out[:out.index("d")+2] + out[out.index("d")+3:] + " ! pipeLength")
+        #else:
+        #   print(out + " ! pipeLength")
     
         #pipeRadius
         out = str('%e' % float(makeBlocks.getBlockByName("***pipeRadius")[0])).replace("e", "d").replace("+","")
-        if out[out.index("d")+1] == "0" and out[out.index("d")+1] != "-":
-            print(out[:out.index("d")+1] + out[out.index("d")+2:] + " ! pipeRadius")
-        elif out[out.find("d-")+2] == "0":
-            print(out[:out.index("d")+2] + out[out.index("d")+3:] + " ! pipeRadius")
-        else:
-            print(out + " ! pipeRadius")
+        print(out + " ! pipeRadius", file = FORTRAN)
+        #if out[out.index("d")+1] == "0" and out[out.index("d")+1] != "-":
+        #    print(out[:out.index("d")+1] + out[out.index("d")+2:] + " ! pipeRadius")
+        #elif out[out.find("d-")+2] == "0":
+        #    print(out[:out.index("d")+2] + out[out.index("d")+3:] + " ! pipeRadius")
+        #else:
+        #    print(out + " ! pipeRadius")
             
         #xygridradius, int
-        
+        print(makeBlocks.getBlockByName("***xygridradius")[0] + " ! xygridradius", file = FORTRAN)
         #zgrid, int
-        
+        print(makeBlocks.getBlockByName("***zgrid")[0] + " ! zgrid", file = FORTRAN)
         #flowSpeed
-        
+        print(str('%e' % float(makeBlocks.getBlockByName("***flowSpeed")[0])).replace("e", "d").replace("+","") + " ! flowSpeed", file = FORTRAN)
         #linearFlowSpeed
-        
-        #integrationStepwidth
-        
-        #
+        if "***linearFlowSpeed" in makeBlocks.foundBlocks:
+            print(str('%e' % float(makeBlocks.getBlockByName("***linearFlowSpeed")[0])).replace("e", "d").replace("+","") + " ! linearFlowSpeed", file = FORTRAN)
+        else:
+            print("0.0d0 ! linearFlowSpeed", file = FORTRAN)
             
-    
-    
-    #Ausgabe zu Testzwecken. Man sieht ja sonst nichts...
-    #----------------------------------------------------
-    print("")
-    print("Testausgabe")
-    print("-----------")
-    print("")
-    print("Eduktmatrix:")
-    print (parseReactions.getSubVec())
-    i = 0 
-    while i < len(parseReactions.getEduMat()):
-        print (parseReactions.getEduMat()[i])
-        i += 1
-    print ("")
-    print("Produktmatrix:")
-    print (parseReactions.getSubVec())
-    i = 0 
-    while i < len(parseReactions.getProMat()):
-        print (parseReactions.getProMat()[i])
-        i += 1
-    print ("")
-    print("Anfangskonzentrationen:")
-    print (parseReactions.getSubVec())
-    print (concentrations)
-    print("")
-    print("Anfangsgeschwindigkeiten:")
-    i = 0 
-    while i < len(makeBlocks.getBlockByName("***reactionRateConstants")):
-        print (str(i+1)+ " "+ makeBlocks.getBlockByName("***reactionRateConstants")[i])
-        i += 1    
+        #integrationStepwidth
+        print(str('%e' % float(makeBlocks.getBlockByName("***integrationStepwidth")[0])).replace("e", "d").replace("+","") + " ! integrationStepwidth", file = FORTRAN)
+        #integrationIntervall
+        print(str('%e' % float(makeBlocks.getBlockByName("***integrationIntervall")[0])).replace("e", "d").replace("+","") + " ! integrationIntervall", file = FORTRAN)
+        #vertical dimension of reaction matrices
+        print(str(len(parseReactions.getEduMat())) + " ! number of reactions", file = FORTRAN)
+        #horizontal dimension of reaction matrices
+        print(str(len(parseReactions.getEduMat()[0])) + " ! number of substances", file = FORTRAN)
+        #integrationmethod
+        print(makeBlocks.getBlockByName("***integrationmethod")[0] + " ! integrationmethod", file = FORTRAN)
+        #inflow
+        if(makeBlocks.getBlockByName("***inflow")[0] == "true"):
+            print(".TRUE. ! inflow", file = FORTRAN)
+        else:
+            print(".FALSE. !inflow", file = FORTRAN)
+        print("", file = FORTRAN)
         
+        i = 0
+        while i < len(parseReactions.getEduMat()):
+            j = 0
+            while j < len(parseReactions.getEduMat()[i]):
+                print(parseReactions.getEduMat()[i][j], file = FORTRAN)
+                j+=1
+            i+=1
+        print("", file = FORTRAN)
+        i = 0
+        while i < len(parseReactions.getProMat()):
+            j = 0
+            while j < len(parseReactions.getProMat()[i]):
+                print(parseReactions.getProMat()[i][j], file = FORTRAN)  
+                j+=1
+            i+=1  
+        print("", file = FORTRAN)
+        i = 0
+        while i < len(makeBlocks.getBlockByName("***reactionRateConstants")):
+            print(str('%e' % float(makeBlocks.getBlockByName("***reactionRateConstants")[i])).replace("e", "d").replace("+",""), file = FORTRAN)
+            i+=1
+        print("")
+        i = 0
+        while i in makeBlocks.getBlockByName("***diffusionCoefficients"):
+            print(str('%e' % float(makeBlocks.getBlockByName("***diffusionCoefficients")[i])).replace("e", "d").replace("+",""), file = FORTRAN)
+            i+=1
+        print("", file = FORTRAN)
+        i = 0
+        while i < len(concentrations):
+            j = 0
+            while j < len(concentrations[i]):
+                print(str('%e' % float(concentrations[i][j])).replace("e", "d").replace("+",""), file = FORTRAN)  
+                j+=1
+            i+=1  
         
+        FORTRAN.close()
+        print("Finished generating FORTRAN-input. Simulation taking the stage, Parser says bye!")
+        os.system(makeBlocks.getBlockByName("***exec")[0]) 
+        exit()
         

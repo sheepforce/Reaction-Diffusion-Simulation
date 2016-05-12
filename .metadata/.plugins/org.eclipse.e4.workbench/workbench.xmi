@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="ASCII"?>
 <application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_Zclp8AV1Eea0srkdNA2EoA" elementId="org.eclipse.e4.legacy.ide.application" contributorURI="platform:/plugin/org.eclipse.platform" selectedElement="_Zclp8QV1Eea0srkdNA2EoA" bindingContexts="_ZcmSzQV1Eea0srkdNA2EoA">
-  <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;workbench>&#xA;&lt;mruList>&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.python.pydev.editor.PythonEditor&quot; name=&quot;Main.py&quot; tooltip=&quot;InputParser/Main.py&quot;>&#xA;&lt;persistable path=&quot;/InputParser/Main.py&quot;/>&#xA;&lt;/file>&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.python.pydev.editor.PythonEditor&quot; name=&quot;BlockGenerator.py&quot; tooltip=&quot;InputParser/Data/BlockGenerator.py&quot;>&#xA;&lt;persistable path=&quot;/InputParser/Data/BlockGenerator.py&quot;/>&#xA;&lt;/file>&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.python.pydev.editor.PythonEditor&quot; name=&quot;ConcentrationParser.py&quot; tooltip=&quot;InputParser/Data/ConcentrationParser.py&quot;>&#xA;&lt;persistable path=&quot;/InputParser/Data/ConcentrationParser.py&quot;/>&#xA;&lt;/file>&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.python.pydev.editor.PythonEditor&quot; name=&quot;Main.py&quot; tooltip=&quot;ConcFileCreator/Main.py&quot;>&#xA;&lt;persistable path=&quot;/ConcFileCreator/Main.py&quot;/>&#xA;&lt;/file>&#xA;&lt;/mruList>&#xA;&lt;/workbench>"/>
+  <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;workbench>&#xA;&lt;mruList>&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.python.pydev.editor.PythonEditor&quot; name=&quot;Main.py&quot; tooltip=&quot;InputParser/Main.py&quot;>&#xA;&lt;persistable path=&quot;/InputParser/Main.py&quot;/>&#xA;&lt;/file>&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.python.pydev.editor.PythonEditor&quot; name=&quot;ConcentrationParser.py&quot; tooltip=&quot;InputParser/Data/ConcentrationParser.py&quot;>&#xA;&lt;persistable path=&quot;/InputParser/Data/ConcentrationParser.py&quot;/>&#xA;&lt;/file>&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.python.pydev.editor.PythonEditor&quot; name=&quot;BlockGenerator.py&quot; tooltip=&quot;InputParser/Data/BlockGenerator.py&quot;>&#xA;&lt;persistable path=&quot;/InputParser/Data/BlockGenerator.py&quot;/>&#xA;&lt;/file>&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.python.pydev.editor.PythonEditor&quot; name=&quot;Main.py&quot; tooltip=&quot;ConcFileCreator/Main.py&quot;>&#xA;&lt;persistable path=&quot;/ConcFileCreator/Main.py&quot;/>&#xA;&lt;/file>&#xA;&lt;/mruList>&#xA;&lt;/workbench>"/>
   <tags>activeSchemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
   <tags>ModelMigrationProcessor.001</tags>
-  <children xsi:type="basic:TrimmedWindow" xmi:id="_Zclp8QV1Eea0srkdNA2EoA" elementId="IDEWindow" contributorURI="platform:/plugin/org.eclipse.platform" selectedElement="_Zclp8gV1Eea0srkdNA2EoA" label="%trimmedwindow.label.eclipseSDK" x="700" y="143" width="840" height="676">
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_Zclp8QV1Eea0srkdNA2EoA" elementId="IDEWindow" contributorURI="platform:/plugin/org.eclipse.platform" selectedElement="_Zclp8gV1Eea0srkdNA2EoA" label="%trimmedwindow.label.eclipseSDK" x="840" y="0" width="842" height="1017">
     <persistedState key="coolBarVisible" value="true"/>
     <persistedState key="perspectiveBarVisible" value="true"/>
     <persistedState key="isRestored" value="true"/>
@@ -157,9 +157,10 @@
             <children xsi:type="basic:PartStack" xmi:id="_ZclqFQV1Eea0srkdNA2EoA" elementId="topLeft" containerData="2600" selectedElement="_ZclqFgV1Eea0srkdNA2EoA">
               <children xsi:type="advanced:Placeholder" xmi:id="_ZclqFgV1Eea0srkdNA2EoA" elementId="org.python.pydev.navigator.view" ref="_ZclrcwV1Eea0srkdNA2EoA"/>
             </children>
-            <children xsi:type="basic:PartSashContainer" xmi:id="_ZclqFwV1Eea0srkdNA2EoA" containerData="7400" selectedElement="_ZclqGAV1Eea0srkdNA2EoA">
+            <children xsi:type="basic:PartSashContainer" xmi:id="_ZclqFwV1Eea0srkdNA2EoA" containerData="7400" selectedElement="_ZclqGQV1Eea0srkdNA2EoA">
               <children xsi:type="advanced:Placeholder" xmi:id="_ZclqGAV1Eea0srkdNA2EoA" elementId="org.eclipse.ui.editorss" containerData="7500" ref="_ZclrQgV1Eea0srkdNA2EoA"/>
               <children xsi:type="basic:PartStack" xmi:id="_ZclqGQV1Eea0srkdNA2EoA" elementId="bottom" containerData="2500" selectedElement="_ZclqGwV1Eea0srkdNA2EoA">
+                <tags>active</tags>
                 <children xsi:type="advanced:Placeholder" xmi:id="_ZclqGgV1Eea0srkdNA2EoA" elementId="org.eclipse.search.ui.views.SearchView" toBeRendered="false" ref="_ZclrWwV1Eea0srkdNA2EoA"/>
                 <children xsi:type="advanced:Placeholder" xmi:id="_ZclqGwV1Eea0srkdNA2EoA" elementId="org.eclipse.ui.console.ConsoleView" ref="_ZclrXAV1Eea0srkdNA2EoA"/>
                 <children xsi:type="advanced:Placeholder" xmi:id="_ZclqHAV1Eea0srkdNA2EoA" elementId="org.eclipse.ui.views.BookmarkView" toBeRendered="false" ref="_ZclrZQV1Eea0srkdNA2EoA"/>
@@ -196,10 +197,8 @@
       <children xsi:type="basic:PartStack" xmi:id="_ZclrQwV1Eea0srkdNA2EoA" elementId="org.eclipse.e4.primaryDataStack" selectedElement="_ZclrTAV1Eea0srkdNA2EoA">
         <tags>org.eclipse.e4.primaryDataStack</tags>
         <tags>EditorStack</tags>
-        <tags>active</tags>
-        <tags>noFocus</tags>
         <children xsi:type="basic:Part" xmi:id="_ZclrSAV1Eea0srkdNA2EoA" elementId="org.eclipse.e4.ui.compatibility.editor" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor" label="BlockGenerator" iconURI="platform:/plugin/org.python.pydev/icons/python_file.gif" closeable="true">
-          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.python.pydev.editor.PythonEditor&quot; name=&quot;BlockGenerator.py&quot; partName=&quot;BlockGenerator&quot; title=&quot;BlockGenerator&quot; tooltip=&quot;InputParser/Data/BlockGenerator.py&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/InputParser/Data/BlockGenerator.py&quot;/>&#xA;&lt;editorState selectionHorizontalPixel=&quot;0&quot; selectionLength=&quot;0&quot; selectionOffset=&quot;167&quot; selectionTopPixel=&quot;516&quot;/>&#xA;&lt;/editor>"/>
+          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.python.pydev.editor.PythonEditor&quot; name=&quot;BlockGenerator.py&quot; partName=&quot;BlockGenerator&quot; title=&quot;BlockGenerator&quot; tooltip=&quot;InputParser/Data/BlockGenerator.py&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/InputParser/Data/BlockGenerator.py&quot;/>&#xA;&lt;editorState selectionHorizontalPixel=&quot;0&quot; selectionLength=&quot;0&quot; selectionOffset=&quot;123&quot; selectionTopPixel=&quot;0&quot;/>&#xA;&lt;/editor>"/>
           <tags>Editor</tags>
           <tags>org.python.pydev.editor.PythonEditor</tags>
           <tags>removeOnHide</tags>
@@ -221,12 +220,10 @@
           </menus>
         </children>
         <children xsi:type="basic:Part" xmi:id="_ZclrTAV1Eea0srkdNA2EoA" elementId="org.eclipse.e4.ui.compatibility.editor" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor" label="Main" iconURI="platform:/plugin/org.python.pydev/icons/python_file.gif" closeable="true">
-          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.python.pydev.editor.PythonEditor&quot; name=&quot;Main.py&quot; partName=&quot;Main&quot; title=&quot;Main&quot; tooltip=&quot;InputParser/Main.py&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/InputParser/Main.py&quot;/>&#xA;&lt;editorState selectionHorizontalPixel=&quot;0&quot; selectionLength=&quot;0&quot; selectionOffset=&quot;4026&quot; selectionTopPixel=&quot;690&quot;/>&#xA;&lt;/editor>"/>
+          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.python.pydev.editor.PythonEditor&quot; name=&quot;Main.py&quot; partName=&quot;Main&quot; title=&quot;Main&quot; tooltip=&quot;InputParser/Main.py&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/InputParser/Main.py&quot;/>&#xA;&lt;editorState selectionHorizontalPixel=&quot;0&quot; selectionLength=&quot;0&quot; selectionOffset=&quot;7224&quot; selectionTopPixel=&quot;1608&quot;/>&#xA;&lt;/editor>"/>
           <tags>Editor</tags>
           <tags>org.python.pydev.editor.PythonEditor</tags>
           <tags>removeOnHide</tags>
-          <tags>active</tags>
-          <tags>activeOnClose</tags>
           <menus xsi:type="menu:PopupMenu" xmi:id="_ZclrTQV1Eea0srkdNA2EoA" elementId="#PyEditContext">
             <tags>menuContribution:popup</tags>
             <tags>popup:#PyEditContext</tags>
@@ -243,6 +240,12 @@
             <tags>menuContribution:popup</tags>
             <tags>popup:#OverviewRulerContext</tags>
           </menus>
+        </children>
+        <children xsi:type="basic:Part" xmi:id="_dweoQBgREeaxV73fvMwWYg" elementId="org.eclipse.e4.ui.compatibility.editor" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor" label="ConcentrationParser" iconURI="platform:/plugin/org.python.pydev/icons/python_file.gif" closeable="true">
+          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.python.pydev.editor.PythonEditor&quot; name=&quot;ConcentrationParser.py&quot; partName=&quot;ConcentrationParser&quot; title=&quot;ConcentrationParser&quot; tooltip=&quot;InputParser/Data/ConcentrationParser.py&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/InputParser/Data/ConcentrationParser.py&quot;/>&#xA;&lt;editorState selectionHorizontalPixel=&quot;0&quot; selectionLength=&quot;0&quot; selectionOffset=&quot;0&quot; selectionTopPixel=&quot;0&quot;/>&#xA;&lt;/editor>"/>
+          <tags>Editor</tags>
+          <tags>org.python.pydev.editor.PythonEditor</tags>
+          <tags>removeOnHide</tags>
         </children>
       </children>
     </sharedElements>
@@ -292,6 +295,8 @@
       <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;view/>"/>
       <tags>View</tags>
       <tags>categoryTag:General</tags>
+      <tags>active</tags>
+      <tags>activeOnClose</tags>
       <menus xmi:id="_ZclrXQV1Eea0srkdNA2EoA" elementId="org.eclipse.ui.console.ConsoleView">
         <tags>ViewMenu</tags>
         <tags>menuContribution:menu</tags>
@@ -349,7 +354,7 @@
       <tags>categoryTag:WindowBuilder</tags>
     </sharedElements>
     <sharedElements xsi:type="basic:Part" xmi:id="_ZclrcwV1Eea0srkdNA2EoA" elementId="org.python.pydev.navigator.view" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="PyDev Package Explorer" iconURI="platform:/plugin/org.python.pydev/icons/pydev_package_explorer.gif" tooltip="" closeable="true">
-      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;view CommonNavigator.LINKING_ENABLED=&quot;0&quot; currentWorkingSetName=&quot;Aggregate for window 1460452789932&quot; org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets=&quot;0&quot;>&#xA;&lt;expanded IMemento.internal.id=&quot;/home/max/Reaction-Diffusion-Simulation/ConcFileCreator&quot;/>&#xA;&lt;expanded IMemento.internal.id=&quot;/home/max/Reaction-Diffusion-Simulation/ConcFileCreator/Data&quot;/>&#xA;&lt;expanded IMemento.internal.id=&quot;/home/max/Reaction-Diffusion-Simulation/InputParser&quot;/>&#xA;&lt;expanded IMemento.internal.id=&quot;/home/max/Reaction-Diffusion-Simulation/InputParser/Data&quot;/>&#xA;&lt;expanded IMemento.internal.id=&quot;/home/max/Reaction-Diffusion-Simulation/InputParser/Main.py&quot;/>&#xA;&lt;selected IMemento.internal.id=&quot;/home/max/Reaction-Diffusion-Simulation/InputParser/Main.py&quot;/>&#xA;&lt;/view>"/>
+      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;view CommonNavigator.LINKING_ENABLED=&quot;0&quot; currentWorkingSetName=&quot;Aggregate for window 1460452789932&quot; org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets=&quot;0&quot;>&#xA;&lt;expanded IMemento.internal.id=&quot;/home/max/Reaction-Diffusion-Simulation/ConcFileCreator&quot;/>&#xA;&lt;expanded IMemento.internal.id=&quot;/home/max/Reaction-Diffusion-Simulation/ConcFileCreator/Data&quot;/>&#xA;&lt;expanded IMemento.internal.id=&quot;/home/max/Reaction-Diffusion-Simulation/InputParser&quot;/>&#xA;&lt;expanded IMemento.internal.id=&quot;/home/max/Reaction-Diffusion-Simulation/InputParser/Data&quot;/>&#xA;&lt;selected IMemento.internal.id=&quot;/home/max/Reaction-Diffusion-Simulation/InputParser/Data/ConcentrationParser.py&quot;/>&#xA;&lt;/view>"/>
       <tags>View</tags>
       <tags>categoryTag:PyDev</tags>
       <menus xmi:id="_ZclrdAV1Eea0srkdNA2EoA" elementId="org.python.pydev.navigator.view">
@@ -369,7 +374,7 @@
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_ZclrlQV1Eea0srkdNA2EoA" elementId="org.eclipse.ui.workbench.file">
         <tags>Draggable</tags>
-        <children xsi:type="menu:HandledToolItem" xmi:id="_VEog0A39EeaGyInkcqArzA" elementId="print" visible="false" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/print_edit.png" tooltip="Print" command="_ZcnhjwV1Eea0srkdNA2EoA"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="__XPLMBgLEeaxV73fvMwWYg" elementId="print" visible="false" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/print_edit.png" tooltip="Print" command="_ZcnhjwV1Eea0srkdNA2EoA"/>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_ZclrowV1Eea0srkdNA2EoA" elementId="additions" toBeRendered="false">
         <tags>toolbarSeparator</tags>
@@ -393,7 +398,7 @@
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_ZcmREQV1Eea0srkdNA2EoA" elementId="org.eclipse.ui.workbench.navigate">
         <tags>Draggable</tags>
-        <children xsi:type="menu:HandledToolItem" xmi:id="_VEsLMA39EeaGyInkcqArzA" elementId="org.eclipse.ui.window.pinEditor" visible="false" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/pin_editor.png" tooltip="Pin Editor" type="Check" command="_ZcnfjwV1Eea0srkdNA2EoA"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="__XTcoBgLEeaxV73fvMwWYg" elementId="org.eclipse.ui.window.pinEditor" visible="false" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/pin_editor.png" tooltip="Pin Editor" type="Check" command="_ZcnfjwV1Eea0srkdNA2EoA"/>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_ZcmRHAV1Eea0srkdNA2EoA" elementId="group.editor" toBeRendered="false">
         <tags>toolbarSeparator</tags>

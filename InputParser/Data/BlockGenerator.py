@@ -9,7 +9,8 @@ Created on 22.01.2016
 class BlockGenerator:
    
     commentTag = "//"
-    startTags = ["***useExistingFortranInput",
+    startTags = ["***exec",
+                 "***useExistingFortranInput",
                  "***zgrid",
                  "***xygridradius",
                  "***reactions",

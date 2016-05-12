@@ -1,6 +1,7 @@
 -- VERSION_4
 -- START DISKCACHE_2
 /home/max/Reaction-Diffusion-Simulation/.metadata/.plugins/org.eclipse.core.resources/.projects/InputParser/com.python.pydev.analysis/v2_indexcache
+Main|1462794868000000000|/home/max/Reaction-Diffusion-Simulation/InputParser/Main.py
 Data.ConcentrationParser|1460537903000000000|/home/max/Reaction-Diffusion-Simulation/InputParser/Data/ConcentrationParser.py
 Data.__init__|1460452681000000000|/home/max/Reaction-Diffusion-Simulation/InputParser/Data/__init__.py
 Data.ReactionParser|1460452681000000000|/home/max/Reaction-Diffusion-Simulation/InputParser/Data/ReactionParser.py
@@ -8,45 +9,46 @@ Data.Interface|1460452681000000000|/home/max/Reaction-Diffusion-Simulation/Input
 Data.BlockGenerator|1461930584000000000|/home/max/Reaction-Diffusion-Simulation/InputParser/Data/BlockGenerator.py
 -- END DISKCACHE
 -- START DICTIONARY
-7
-2=Data.ConcentrationParser
-5=ConcentrationParser
-3=Data.ReactionParser
-1=Data.BlockGenerator
-6=BlockGenerator
-4=ReactionParser
-7=BlockGenerator.__init__
+8
+3=Data.ConcentrationParser
+1=Main
+6=ConcentrationParser
+4=Data.ReactionParser
+2=Data.BlockGenerator
+7=BlockGenerator
+5=ReactionParser
+8=BlockGenerator.__init__
 -- END DICTIONARY
 -- START TREE 1
 11
-arg|0|
-blo|1|BlockGenerator!9@
-con|1|ConcentrationParser!17@
-for|0|
-i|0|
-mak|0|
-opt|0|
-par|0|
-pip|0|
-rea|1|ReactionParser!25@
-sou|0|
+arg|1|args!11@
+blo|1|BlockGenerator!17@
+con|2|concentrations!11@ConcentrationParser!25@
+for|1|fortranInput!11@
+i|1|i!11@
+mak|1|makeBlocks!11@
+opt|1|options!11@
+out|1|out!11@
+par|1|parseReactions!11@
+rea|1|ReactionParser!33@
+sou|2|source!11@sourceFile!11@
 -- END TREE
 -- START TREE 2
 16
-__i|3|__init__!4&26@__init__!5&18@__init__!6&10@
-adj|1|adjustLengthOfReactandMatrices!4&26@
-blo|1|blocks!6&11@
-cle|3|clean!7&11@clean!6&11@cleanData!6&10@
-com|1|commentTag!6&11@
-edu|1|eduMat!4&27@
-end|1|endTag!6&11@
-fou|1|foundBlocks!6&11@
-gen|2|generateCoeVec!4&26@generateBlocks!6&10@
-get|5|getConcentrations!6&10@getSubVec!4&26@getEduMat!4&26@getProMat!4&26@getBlockByName!6&10@
-min|2|minimumInfo!7&11@minimumInfo!6&11@
-par|2|parseLine!4&26@parse!5&18@
-pro|1|proMat!4&27@
-rea|1|reactionArrow!4&27@
-sta|1|startTags!6&11@
-sub|3|subOffTag!4&27@subVec!4&27@subTag!4&27@
+__i|3|__init__!5&34@__init__!6&26@__init__!7&18@
+adj|1|adjustLengthOfReactandMatrices!5&34@
+blo|1|blocks!7&19@
+cle|3|clean!8&19@clean!7&19@cleanData!7&18@
+com|1|commentTag!7&19@
+edu|1|eduMat!5&35@
+end|1|endTag!7&19@
+fou|1|foundBlocks!7&19@
+gen|2|generateCoeVec!5&34@generateBlocks!7&18@
+get|5|getSubVec!5&34@getConcentrations!7&18@getEduMat!5&34@getProMat!5&34@getBlockByName!7&18@
+min|2|minimumInfo!8&19@minimumInfo!7&19@
+par|2|parseLine!5&34@parse!6&26@
+pro|1|proMat!5&35@
+rea|1|reactionArrow!5&35@
+sta|1|startTags!7&19@
+sub|3|subOffTag!5&35@subVec!5&35@subTag!5&35@
 -- END TREE
