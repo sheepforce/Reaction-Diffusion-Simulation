@@ -1,0 +1,37 @@
+500.0d0			! PipeLength
+10.0d0			! PipeRadius
+5			! NGridXY
+20			! NGridZ --> Achtung, der MUSS stimmen für äquidistante Bedingungen. Tut er das nicht, wird pipe_3devolve sofort mit Fehlermeldung beenden
+0.2d-2			! vmax
+0.0d0			! vadd
+1.0d-3			! dTime
+1.0d3			! FinalTime
+2			! EdMat/ProdMat, Dimension 1, ebenso Größe des RateVec
+4			! EdMat/ProdMat, Dimension 2, ebenso Größe des DiffVec
+2			! method --> 1 = Euler, 2 = Runge Kutta 4. Ordnung
+.TRUE.			! Inflow im Rohr, Boolean in FORTRAN NOTATION!!!
+
+EdMat
+EdMat
+
+ProdMat
+ProdMat
+
+RateVec
+RateVec
+
+DiffVec
+DiffVec
+
+(X1 Y1 Z1 Omega1)	! PipeConc --> Werte laufen in DIESER Reihenfolge, in DOUBLE PRECISION!, natürlich ohne Klammern und nur die Zahlen.
+(X2 Y1 Z1 Omega1)
+(X1 Y2 Z1 Omega1)
+(X2 Y2 Z1 Omega1)
+(X1 Y1 Z2 Omega1)
+(X2 Y1 Z2 Omega1)
+(X1 Y2 Z2 Omega1)
+(X2 Y2 Z2 Omega1)
+(X1 Y1 Z1 Omega2)
+....
+
+

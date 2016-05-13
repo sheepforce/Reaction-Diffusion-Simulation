@@ -1,0 +1,80 @@
+//Testdatei für inputfile-Leseprogramm
+
+//Kommandozeilenbefehl zur parallelen Ausfürhung des FORTRAN-Programms
+***exec
+kate
+***end
+
+//Flag für Einsatz bereits existierendes Fortran-inputfile, optional
+//***pathToExistingFortranInput
+
+//***end
+
+//reale Länge des Rohrs
+***pipeLength
+0.0000000000000000000000000000012356
+***end
+
+//realer Radius des Rohrs
+***pipeRadius
+0.45
+***end
+
+***zgrid
+2
+***end
+
+***xygridradius
+1
+***end
+
+//Reaktionen mit zugehörigen Ratenkonstanten
+***reactions
+1{test} -> 2{a}+3{test2}
+1{test} -> 2{a}+3{test2}
+***end
+
+***reactionRateConstants
+23
+1
+***end
+
+***diffusionCoefficients
+substance value
+***end
+
+//Zufluss ins Rohr; erste Schicht ist konstant
+***inflow
+true
+***end
+
+//maximale Strömungsgeschwindigkeit
+***flowSpeed
+1.52
+***end
+
+//Integrationsschrittweite (in Sekunden)
+***integrationStepwidth
+10
+***end
+
+//Integrationsdauer (in Sekunden)
+***integrationIntervall
+1232
+***end
+
+//Verzeichnis, in dem Konzentrationsdateien liegen
+***concFileRepository
+/path/to/repository/
+***end
+
+//Integrationsmethode
+***integrationmethod
+1
+***end
+
+//additive lineare Strömungsgeschwindigkeit
+***linearFlowSpeed
+1
+***end
+

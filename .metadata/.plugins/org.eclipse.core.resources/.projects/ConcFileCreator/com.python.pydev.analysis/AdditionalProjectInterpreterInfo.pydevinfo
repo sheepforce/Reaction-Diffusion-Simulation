@@ -1,0 +1,47 @@
+-- VERSION_4
+-- START DISKCACHE_2
+/home/max/Reaction-Diffusion-Simulation/.metadata/.plugins/org.eclipse.core.resources/.projects/ConcFileCreator/com.python.pydev.analysis/v2_indexcache
+Data.Calc|1460452681000000000|/home/max/Reaction-Diffusion-Simulation/ConcFileCreator/Data/Calc.py
+Main|1460452681000000000|/home/max/Reaction-Diffusion-Simulation/ConcFileCreator/Main.py
+Data.GUI|1460452681000000000|/home/max/Reaction-Diffusion-Simulation/ConcFileCreator/Data/GUI.py
+Data.__init__|1460452681000000000|/home/max/Reaction-Diffusion-Simulation/ConcFileCreator/Data/__init__.py
+-- END DISKCACHE
+-- START DICTIONARY
+8
+5=GUI
+1=Data.Calc
+3=Main
+2=Data.GUI
+8=GUI.savePipeToFile
+7=GUI.drawPipe
+6=GUI.__init__
+4=Calc
+-- END DICTIONARY
+-- START TREE 1
+3
+cal|1|Calc!9@
+gui|2|GUI!17@GUI!25@
+tes|1|test!27@
+-- END TREE
+-- START TREE 2
+19
+__i|3|__init__!4&10@__init__!5&18@__init__!5&26@
+app|2|app!5&19@app!5&27@
+bas|4|base!6&27@base!5&27@base!6&19@base!5&19@
+cal|1|calculatePipe!4&10@
+con|2|concFields!7&27@concFields!5&27@
+dra|2|drawPipe!5&18@drawPipe!5&26@
+gen|1|generatePipe!4&10@
+ini|4|initIn!6&27@initIn!5&27@initIn!6&19@initIn!5&19@
+iss|4|isSolventSel!6&19@isSolventSel!5&19@isSolventSel!6&27@isSolventSel!5&27@
+mak|4|makePipe!6&19@makePipe!5&19@makePipe!6&27@makePipe!5&27@
+min|4|MINYSIZE!5&27@MINYSIZE!5&19@MINXSIZE!5&19@MINXSIZE!5&27@
+pat|4|pathIn!6&19@pathIn!5&19@pathIn!6&27@pathIn!5&27@
+pip|4|pipeArea!7&27@pipeArea!5&27@pipeArea!7&19@pipeArea!5&19@
+rin|4|rIn!6&19@rIn!5&19@rIn!6&27@rIn!5&27@
+sav|5|savePipe!6&19@savePipe!5&19@savePipe!6&27@savePipe!5&27@savePipeToFile!5&26@
+scr|4|screenx!5&27@screeny!5&19@screeny!5&27@screenx!5&19@
+sub|4|subsIn!6&19@subsIn!5&19@subsIn!6&27@subsIn!5&27@
+z|3|z!8&27@z!7&27@z!5&27@
+zin|4|zIn!6&27@zIn!5&27@zIn!6&19@zIn!5&19@
+-- END TREE
