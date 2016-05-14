@@ -10,8 +10,18 @@ REAL*8, DIMENSION(:), ALLOCATABLE :: RateVec, DiffVec
 REAL*8, DIMENSION(:,:,:,:,:), ALLOCATABLE :: PipeConc
 LOGICAL :: InFlow
 
-
 INTEGER :: lambda, Omega, N, I
+
+INTERFACE
+        SUBROUTINE PIPE_3DEVOLVE(PipeLength, PipeRadius, NGridXY, NGridZ, vmax, vadd, dTime, &
+        FinalTime, EdMat, ProdMat, RateVec, DiffVec, PipeConc, method, Inflow)
+                USE mpi
+
+                INCLUDE 'pipe_3devolve.fh'
+
+                INTEGER :: ierr, NProcs, ProcID, IProc, GenericTag = 1
+        END SUBROUTINE
+END INTERFACE
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!
