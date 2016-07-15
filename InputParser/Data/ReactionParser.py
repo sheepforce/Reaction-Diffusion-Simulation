@@ -36,12 +36,12 @@ class ReactionParser():
             
             #Bestimmung des stoechiometrischen Koeffizienten
             #-----------------------------------------------
-            range = 0                                           #counter fuer Laenge des relevanten Bereichs
-            while equation[position+range] != self.subTag:      
-                range = range+1                                 #bestimme Laenge des Stringteils, in dem der Wert fuer den stoech. Koeff. steht
-            if range != 0:
-                factor = equation[position:position+range]      #und speichere ihn
-            position = position + range                         #setze dann den Positionszeiger hinter den ausgewerteten Stringteil
+            blockrange = 0                                           #counter fuer Laenge des relevanten Bereichs
+            while equation[position+blockrange] != self.subTag:      
+                blockrange = blockrange+1                                 #bestimme Laenge des Stringteils, in dem der Wert fuer den stoech. Koeff. steht
+            if blockrange != 0:
+                factor = equation[position:position+blockrange]      #und speichere ihn
+            position = position + blockrange                         #setze dann den Positionszeiger hinter den ausgewerteten Stringteil
             
             
             #Bestimmung des Substanznamens
