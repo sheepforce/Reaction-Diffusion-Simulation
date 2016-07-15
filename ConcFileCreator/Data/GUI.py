@@ -4,9 +4,10 @@ Created on 03.04.2016
 @author: maximilian
 '''
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
 import sys
+
+from PyQt4.QtGui import *
+
 
 class GUI(QWidget):
     
@@ -51,7 +52,7 @@ class GUI(QWidget):
         #add a frame to the scrollable window with minimum MINXSIZE x MINYSIZE and maximum screen size dimension
         self.base = QWidget()
         self.base.resize(self.screenx, self.screeny)
-       # base.resize(scrollbase.size())
+        # base.resize(scrollbase.size())
         if self.screenx < self.MINXSIZE:
             self.base.resize(self.MINXSIZE, self.base.height())
         if self.screeny < self.MINYSIZE:

@@ -1,8 +1,8 @@
 //Testdatei für inputfile-Leseprogramm
 
-//Kommandozeilenbefehl zur parallelen Ausfürhung des FORTRAN-Programms
+//Kommandozeilenparameter zur parallelen Ausfürhung des FORTRAN-Programms
 ***exec
-kate
+kate /home/max/Reaction-Diffusion-Simulation/InputParser/a.dat
 ***end
 
 //Flag für Einsatz bereits existierendes Fortran-inputfile, optional
