@@ -15,11 +15,15 @@ INTEGER :: lambda, Omega, N, I
 INTERFACE
         SUBROUTINE PIPE_3DEVOLVE(PipeLength, PipeRadius, NGridXY, NGridZ, vmax, vadd, dTime, &
         FinalTime, EdMat, ProdMat, RateVec, DiffVec, PipeConc, method, Inflow)
-                USE mpi
-
+        
+#ifdef openMPI
+		INCLUDE "mpif.h"
+#endif
                 INCLUDE 'pipe_3devolve.fh'
-
+                
+#ifdef openMPI
                 INTEGER :: ierr, NProcs, ProcID, IProc, GenericTag = 1
+#endif
         END SUBROUTINE
 END INTERFACE
 

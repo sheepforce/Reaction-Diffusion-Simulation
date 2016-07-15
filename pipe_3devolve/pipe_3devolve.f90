@@ -57,7 +57,6 @@ SUBROUTINE PIPE_3DEVOLVE(PipeLength, PipeRadius, NGridXY, NGridZ, vmax, vadd, dT
 FinalTime, EdMat, ProdMat, RateVec, DiffVec, PipeConc, method, Inflow)
 
 #ifdef openMPI
-USE mpi
 #else
 USE omp_lib
 #endif
@@ -65,6 +64,9 @@ USE omp_lib
 
 IMPLICIT NONE
 
+#ifdef openMPI
+INCLUDE "mpif.h"
+#endif
 INCLUDE 'pipe_3devolve.fh'
 
 INTEGER :: ierr, NProcs, ProcID, IProc, GenericTag = 1, BCastSendCount, WriteInt			! WriteInt gives the distance of integration steps to write out PipeConc
@@ -143,6 +145,8 @@ CALL MPI_COMM_SIZE(MPI_COMM_WORLD, NProcs, ierr)							! how many MPI processes 
 Omega = SIZE(PipeConc,4)
 N = SIZE(RateVec)
 NSteps = NINT(FinalTime / dTime)
+NSteps = NSteps + (1000 - MOD(NSteps, 1000))								! manipulate NSteps that it becomes dividable by 1000, rounding upwards
+
 lambda = 1
 I = 1
 SubsNum = 1
