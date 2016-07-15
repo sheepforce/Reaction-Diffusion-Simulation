@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 '''
 Created on 22.01.2016
 
@@ -61,9 +63,14 @@ if __name__ == "__main__":
         concentrations = []                                                  #Anfangskonzentrationen parsen
         for i in xrange(len(parseReactions.getSubVec())):
             concentrations.append(ConcentrationParser.parse(parseReactions.getSubVec()[i], makeBlocks.getConcentrations()[0], int(makeBlocks.getBlockByName("***zgrid")[0]), int(makeBlocks.getBlockByName("***zgrid")[0])))
+        print("Done. Start writing overview file for substance assignement.")
+        SUBSTANCES = open(source + "_substances.dat", "w")
+        for i in xrange(len(parseReactions.getSubVec())):
+            print("Subs" + str(i+1) + " = " + parseReactions.getSubVec()[i], file = SUBSTANCES)
+        SUBSTANCES.close()        
         print("Done. Start generating input for simulation program.")  
         
-        FORTRAN = open(source + ".dat", "w")
+        FORTRAN = open("Init.dat", "w")
         
     
         #Generierung des inputfile fuer fortran
@@ -152,6 +159,6 @@ if __name__ == "__main__":
         
         FORTRAN.close()
         print("Finished generating FORTRAN-input. Simulation taking the stage, Parser says bye!")
-        os.system(makeBlocks.getBlockByName("***exec")[0]) 
+        os.system(makeBlocks.getBlockByName("***exec") + " pipe_3delvolve") 
         exit()
         

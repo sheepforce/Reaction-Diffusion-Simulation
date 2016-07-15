@@ -9,8 +9,7 @@ Created on 22.01.2016
 class BlockGenerator:
    
     commentTag = "//"
-    startTags = ["***exec",
-                 "***useExistingFortranInput",
+    startTags = ["***useExistingFortranInput",
                  "***zgrid",
                  "***xygridradius",
                  "***reactions",
@@ -33,6 +32,8 @@ class BlockGenerator:
     minimumInfo = False
    
     def __init__(self, sourceFile):
+        self.blocks.append(self.extractExecCommand(sourceFile))
+        self.foundBlocks.append("***exec")
         self.clean = self.cleanData(sourceFile)     #entferne stoerende Zeilen aus den Rohdaten
         self.generateBlocks()
         completedata = "***reactions" in self.foundBlocks and "***reactionRateConstants" in self.foundBlocks 
@@ -72,6 +73,20 @@ class BlockGenerator:
 
     def getBlockByName(self, name):
         return self.blocks[self.foundBlocks.index(name)]
+    
+    def extractExecCommand(self, data):
+        i = data.index("***exec\n") + 1
+        data[i-1] = ""
+        command = ""
+        while data[i] != self.endTag + "\n":
+            data[i] = data[i].replace("\n","")#entferne Zeilenumbrueche
+            command = command + data[i]
+            data[i] = ""
+            i += 1
+        data[i] = ""
+        return command
+                    
+                
     
     
  
