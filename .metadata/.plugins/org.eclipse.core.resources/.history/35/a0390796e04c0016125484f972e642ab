@@ -1,0 +1,17 @@
+'''
+Created on 18.07.2016
+
+@author: max
+'''
+
+class MyClass(object):
+    '''
+    classdocs
+    '''
+
+
+    def __init__(self, params):
+        '''
+        Constructor
+        '''
+        

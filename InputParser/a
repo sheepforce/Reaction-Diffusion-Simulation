@@ -40,7 +40,9 @@ kate /home/max/Reaction-Diffusion-Simulation/InputParser/a.dat
 ***end
 
 ***diffusionCoefficients
-substance value
+{test}1232
+{a}42
+{test2}21
 ***end
 
 //Zufluss ins Rohr; erste Schicht ist konstant
