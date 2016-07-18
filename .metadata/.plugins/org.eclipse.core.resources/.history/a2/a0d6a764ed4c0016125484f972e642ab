@@ -1,0 +1,113 @@
+'''
+Created on 18.07.2016
+
+@author: max
+'''
+import png
+
+class PlotGraph():
+    #z (start 1, ende zgrid), dann y(start -gridradius, ende +gridradius), dann x (wie y), dann t (start von vorne)
+    #es laeuft also von -x,-y,1 nach -x,-y,z, dann -x, -y+1, 1 nach -x, -y+1, z ... -x, y, 1 nach -x, y, z, dann -x+1, -y, 1 nach -x+1, -y, z bis x, y, 1 nach x, y, z
+    #"Steps output
+    
+    file = []
+    grid = [] #x,y,z,t
+    xgrid = 3
+    ygrid = 3
+    zgrid = 6
+    tgrid = 3
+    maxConcentration = 0
+    
+    
+    def __init__(self, dataFile, xy, z):
+        self.setColorScale(dataFile)
+        line = 0
+        x = 0
+        y = 0
+        z = 0
+        t = 0
+        while z < self.zgrid:
+            self.grid.append([])
+            while y < self.ygrid:
+                self.grid[z].append([])
+                while x < self.xgrid:
+                    self.grid[z][y].append([])
+                    while t < self.tgrid:
+                        self.grid[z][y][x].append([])
+                        self.grid[z][y][x][t] = self.file[line]
+                        print(str(x) + " " + str(y) + " " + str(z) + " " + str(t) + " " + str(self.grid[z][y][x][t]))
+                        t += 1
+                        line += 1
+                    t = 0
+                    x += 1
+                x = 0
+                y += 1
+            y = 0
+            z += 1
+        
+        self.getXYTLayer(2,1)
+           
+            
+    
+    
+
+    def setColorScale(self, inFile):
+        for i in xrange(len(inFile)):
+            inFile[i] = float(inFile[i].replace("\n",""))
+            if inFile[i] > self.maxConcentration and inFile[i] != 1000:
+                self.maxConcentration = inFile[i]
+        for i in xrange(len(inFile)):
+            self.file.append(int(round(inFile[i] / self.maxConcentration * 255)))
+        
+        
+    
+    def getXYTLayer(self, z, t):
+        layer = []
+        x = 0
+        y = 0
+        while x < self.xgrid:
+            layer.append([])
+            while y < self.ygrid:
+                layer[x].append(self.grid[x][y][z][t])
+                y += 1
+            x += 1
+            y = 0
+        print(layer)
+        test = open('test.png', 'wb')
+        writer = png.Writer(len(layer),len(layer[0]), greyscale=True)
+        writer.write(test, layer) ; test.close()
+        
+        
+    def getXZTLayer(self, y, t):
+        layer = []
+        x = 0
+        z = 0
+        while z < self.zgrid:
+            layer.append([])
+            while x < self.xgrid:
+                layer[z].append(self.grid[x][y][z][t])
+                x += 1
+            z += 1
+            x = 0
+        print(layer)
+        test = open('test.png', 'wb')
+        writer = png.Writer(len(layer),len(layer[0]), greyscale=True)
+        writer.write(test, layer) ; test.close()
+        
+    def getYZTLayer(self, x, t):
+        layer = []
+        y = 0
+        z = 0
+        while y < self.ygrid:
+            layer.append([])
+            while z < self.zgrid:
+                layer[y].append(self.grid[x][y][z][t])
+                z += 1
+            y += 1
+            z = 0
+        print(layer)
+        test = open('test.png', 'wb')
+        writer = png.Writer(len(layer),len(layer[0]), greyscale=True)
+        writer.write(test, layer) ; test.close()
+        
+            

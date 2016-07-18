@@ -1,0 +1,37 @@
+'''
+Created on 18.07.2016
+
+@author: max
+'''
+
+from copy import deepcopy
+
+class DiffusionParser():
+    
+    subOffTag = '}'
+    diffusionCoefficients = []
+    
+
+    def __init__(self, substances, diffCoeffs):
+        diffusionCoefficients = deepcopy(substances)
+        for i in xrange(len(diffCoeffs)):
+            j = 0
+            print(diffCoeffs[i][j])
+            while diffCoeffs[i][j] != self.subOffTag:
+                j += 1
+            substance = diffCoeffs[i][0:j]
+            value = diffCoeffs[i][j:]
+            print(substance + " " + value)
+            if (substance not in diffusionCoefficients):
+                print("Found diffusion coefficient for substance not in reactions. Aborting.")
+                exit()
+            diffusionCoefficients[diffusionCoefficients.index(substance)] = value
+            
+            
+            
+                
+            
+            
+            
+
+        

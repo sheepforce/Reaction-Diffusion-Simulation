@@ -9,6 +9,7 @@ from __future__ import print_function
 from Data.ReactionParser import ReactionParser
 from Data.BlockGenerator import BlockGenerator
 from Data.ConcentrationParser import ConcentrationParser
+from Data.DiffusionParser import DiffusionParser
 
 
 import argparse
@@ -58,12 +59,21 @@ if __name__ == "__main__":
             print ("Error while parsing data. Check your reaction-equations in the input file.")
             raw_input("Press ENTER to exit program.")
             exit()
-        print("Done. Start parsing starting concentrations.")       
+        print("Done. Start parsing diffusion coefficients.")       
+        
+        try:                                                                    #Diffusionskoeffizienten parsen
+            parseDiffCoeffs = DiffusionParser(parseReactions.getSubVec(), makeBlocks.getBlockByName("***diffusionCoefficients"))
+        except Exception:
+            print ("Error while parsing data. Check your diffusion coefficients in the input file.")
+            raw_input("Press ENTER to exit program.")
+            exit()
+        print("Done. Start parsing starting concentrations.")    
+        
     
         concentrations = []                                                  #Anfangskonzentrationen parsen
         for i in xrange(len(parseReactions.getSubVec())):
             concentrations.append(ConcentrationParser.parse(parseReactions.getSubVec()[i], makeBlocks.getConcentrations()[0], int(makeBlocks.getBlockByName("***zgrid")[0]), int(makeBlocks.getBlockByName("***zgrid")[0])))
-        print("Done. Start writing overview file for substance assignement.")
+        print("Done. Start writing overview file for substance assignment.")
         SUBSTANCES = open(source + "_substances.dat", "w")
         for i in xrange(len(parseReactions.getSubVec())):
             print("Subs" + str(i+1) + " = " + parseReactions.getSubVec()[i], file = SUBSTANCES)
@@ -145,8 +155,8 @@ if __name__ == "__main__":
             i+=1
         print("")
         i = 0
-        while i in makeBlocks.getBlockByName("***diffusionCoefficients"):
-            print(str('%e' % float(makeBlocks.getBlockByName("***diffusionCoefficients")[i])).replace("e", "d").replace("+",""), file = FORTRAN)
+        while i < len(parseDiffCoeffs.diffusionCoefficients):
+            print(str('%e' % float(parseDiffCoeffs.diffusionCoefficients[i])).replace("e", "d").replace("+",""), file = FORTRAN)
             i+=1
         print("", file = FORTRAN)
         i = 0

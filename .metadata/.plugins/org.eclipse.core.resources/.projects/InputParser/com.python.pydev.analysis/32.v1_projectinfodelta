@@ -1,0 +1,9 @@
+INSTUPData.DiffusionParser
+/home/max/Reaction-Diffusion-Simulation/InputParser/Data/DiffusionParser.py
+INFOS:&&1|1|2|0&&3|3|2|1&&3|4|2|1&&2|5|2|1&&3|4|2|6
+__init__=5
+diffusionCoefficients=4
+subOffTag=3
+DiffusionParser=1
+Data.DiffusionParser=2
+DiffusionParser.__init__=6
