@@ -1,9 +1,0 @@
-MODULES_MANAGER_V2
---COMMON--
-0=/home/max/Software/PythonPNG/lib/python2.7/site-packages/pypng-0.0.18-py2.7.egg
---END-COMMON--
-MODULES_MANAGER_V2
-Data.PlotGraph|/home/max/Reaction-Diffusion-Simulation/Plotter/Data/PlotGraph.py
-Data.__init__|/home/max/Reaction-Diffusion-Simulation/Plotter/Data/__init__.py
-Main|/home/max/Reaction-Diffusion-Simulation/Plotter/Main.py
-png|0|png.py|1

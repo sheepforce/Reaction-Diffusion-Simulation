@@ -1,3 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">&#x0A;<refactoring comment="Delete resource &apos;Plotter/Data/Plot.py&apos;" deleteContents="false" description="Delete resource &apos;Plotter/Data/Plot.py&apos;" element1="/Plotter/Data/Plot.py" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1468843815485"/>&#x0A;<refactoring comment="Delete resource &apos;Plotter/Data/PlotGraph.py&apos;" deleteContents="false" description="Delete resource &apos;Plotter/Data/PlotGraph.py&apos;" element1="/Plotter/Data/PlotGraph.py" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1468843888764"/>
-</session>
