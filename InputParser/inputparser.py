@@ -153,7 +153,7 @@ if __name__ == "__main__":
         while i < len(makeBlocks.getBlockByName("***reactionRateConstants")):
             print(str('%e' % float(makeBlocks.getBlockByName("***reactionRateConstants")[i])).replace("e", "d").replace("+",""), file = FORTRAN)
             i+=1
-        print("")
+        print("", file = FORTRAN)
         i = 0
         while i < len(parseDiffCoeffs.diffusionCoefficients):
             print(str('%e' % float(parseDiffCoeffs.diffusionCoefficients[i])).replace("e", "d").replace("+",""), file = FORTRAN)
@@ -169,6 +169,6 @@ if __name__ == "__main__":
         
         FORTRAN.close()
         print("Finished generating FORTRAN-input. Simulation taking the stage, Parser says bye!")
-        os.system(makeBlocks.getBlockByName("***exec") + " pipe_3delvolve") 
+        os.system(makeBlocks.getBlockByName("***exec") + " pipe_3devolve") 
         exit()
         
