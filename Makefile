@@ -7,7 +7,7 @@
 ############################
 #
 # Installation prefix
-PREFIX		= /cluster/cphillip/RDS-Simulation/Reaction-Diffusion-Simulation/bin
+PREFIX		= /home/phillip/software
 
 # Fortran compiler, must support Fortran90, others will propably work too but were not tested
 FC		= gfortran			# gfortran from the gnu compiler collection, RECOMMENDED
