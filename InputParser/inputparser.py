@@ -169,6 +169,6 @@ if __name__ == "__main__":
         
         FORTRAN.close()
         print("Finished generating FORTRAN-input. Simulation taking the stage, Parser says bye!")
-        os.system(makeBlocks.getBlockByName("***exec") + " pipe_3devolve") 
+        os.system(makeBlocks.getBlockByName("***exec") + " pipe_3devolve > Output.log") 
         exit()
         
