@@ -8,6 +8,6 @@ INTEGER, INTENT(IN) :: PointX, PointY, NGridXY
 REAL*8, INTENT(IN) :: vmax, vadd
 
 
-FLOW_PROFILE = - vmax * (PointX ** 2 + PointY ** 2) + vmax * NGridXY ** 2 + vadd
+FLOW_PROFILE = vmax * (1 - ((SQRT(DBLE(PointX ** 2 + PointY ** 2))) / DBLE(NGridXY)) ** 2) + vadd
 
 END FUNCTION
