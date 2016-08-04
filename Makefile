@@ -73,8 +73,9 @@ install:
 	cd pipe_3devolve && for i in *.bin ; do cp $$i $(PREFIX)/bin/$${i%".bin"} ; done
 	cp InputParser/inputparser.py $(PREFIX)/bin/inputparser
 	cp ConcFileCreator/concfilecreator $(PREFIX)/bin/concfilecreator
-	cp Plotter/Plotter.py $(PREFIX)/bin/plotter
+	cp scripts/pipeplot.sh $(PREFIX)/bin/pipeplot
+	#cp Plotter/Plotter.py $(PREFIX)/bin/plotter
 	cp -r InputParser/Data $(PREFIX)/bin/.
 	cp -r ConcFileCreator/Data $(PREFIX)/bin/.
-	cp -r Plotter/Data $(PREFIX)/bin/.
+	#cp -r Plotter/Data $(PREFIX)/bin/.
 	cd $(PREFIX)/bin && chmod +x *
