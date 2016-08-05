@@ -42,14 +42,16 @@ if [ "$ViewDir" == "z" ]
   then 
     echo "set view equal" >> pp.gnuplt
 fi
-if [ "$PlotType" == "pm3d" ]
-  then
-    echo "set dgrid3d 80,80 qnorm 100" >> pp.gnuplt
-    PlotLook=" "
-  elif [ "$PlotType" == "points" ]
-    then
-      PlotLook="pointtype 7 pointsize 2.5"
-fi
+case "$PlotType" in
+  "pm3d") 	echo "set dgrid3d 80,80 qnorm 100" >> pp.gnuplt
+		PlotLook=" "
+    ;;
+  "points")	PlotLook="pointtype 7 pointsize 2.5"
+    ;;
+  "lines")	echo "set dgrid3d 80,80 qnorm 100" >> pp.gnuplt
+    ;;
+  *)		PlotLook="pointtype 7 pointsize 2.5"
+esac
 echo "set view 0,0" >> pp.gnuplt
 echo "unset ztics" >> pp.gnuplt
 echo "unset key" >> pp.gnuplt
