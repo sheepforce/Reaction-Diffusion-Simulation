@@ -32,7 +32,7 @@ WRITE(*, *)
 WRITE(*, *) "Initializing variables now"
 
 NGridXY = 5
-vmax = 5.0d-4
+vmax = 5.0d-2
 vadd = 1.0d-4
 PipeLength = 1.0d00
 PipeRadius = 1.0d-2

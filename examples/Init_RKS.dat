@@ -1,0 +1,17 @@
+1.0d-3			! dTime
+1.0d3			! FinalTime
+2			! EdMat/ProdMat, Dimension 1, ebenso Größe des RateVec
+4			! EdMat/ProdMat, Dimension 2, ebenso Größe des DiffVec
+2			! method --> 1 = Euler, 2 = Runge Kutta 4. Ordnung
+
+EdMat
+EdMat
+
+ProdMat
+ProdMat
+
+RateVec
+RateVec
+
+ConcVec
+ConcVec

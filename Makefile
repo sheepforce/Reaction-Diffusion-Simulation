@@ -47,12 +47,16 @@ NUMERIC_OBJECT	+= laplacian.o
 NUMERIC_OBJECT	+= diff_int.o
 NUMERIC_OBJECT	+= rks_rk4int.o
 
-all: pipe_3devolve reform_conc
+all: pipe_3devolve reform_conc rks_solv
 
 pipe_3devolve: numeric_routines
 	cd pipe_3devolve && $(FC) $(FFLAGS) $(FPPOPTIONS) -c pipe_3devolve.f90
 	cd pipe_3devolve && $(FC) $(FFLAGS) $(FPPOPTIONS) -c init_pipe_3devolve.f90
 	cd pipe_3devolve && $(FC) $(FFLAGS) $(FPPOPTIONS) $(NUMERIC_OBJECT) pipe_3devolve.o init_pipe_3devolve.o -o pipe_3devolve.bin
+
+rks_solv: numeric_routines
+	cd pipe_3devolve && $(FC) $(FFLAGS) $(FPPOPTIONS) -c init_rks_solv.f90 rks_solv.f90
+	cd pipe_3devolve && $(FC) $(FFLAGS) $(FPPOPTIONS) $(NUMERIC_OBJECT) init_rks_solv.o rks_solv.o -o rks_solv.bin
 
 reform_conc:
 	cd pipe_3devolve && for i in reform_conc*.f90 ; do $(FC) $(FFLAGS) $$i -o $${i%".f90"}.bin ; done
@@ -65,8 +69,8 @@ testing: pipe_3devolve
 	cd pipe_3devolve && $(FC) $(FFLAGS) $(NUMERIC_OBJECT) test_pipe_3devolve.o pipe_3devolve.o -o test_pipe_3devolve.bin
 
 clean:
-	cd pipe_3devolve && rm *.o
-	cd pipe_3devolve && rm *.bin
+	cd pipe_3devolve && rm -f *.o
+	cd pipe_3devolve && rm -f *.bin
 
 install:
 	mkdir -p $(PREFIX)/bin
