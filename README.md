@@ -27,8 +27,8 @@ A Makefile for use with gfortran on Unix-Systems is provided. Its head looks lik
     PREFIX		= /usr/local
     
     # Fortran compiler, must support Fortran90, others will propably work too but were not tested
-    FC		= gfortran			# gfortran from the gnu compiler collection, RECOMMENDED
-    #FC		= mpif90			# OpenMPI mpif90 if you want to build with MPI Support, EXPERIMENTAL
+    FC			= gfortran			# gfortran from the gnu compiler collection, RECOMMENDED
+    #FC			= mpif90			# OpenMPI mpif90 if you want to build with MPI Support, EXPERIMENTAL
     
     # Fortran compiler flags
     FFLAGS		=  -fopenmp			# enables OpenMP SMP parallelization, RECOMMENDED
@@ -40,15 +40,16 @@ A Makefile for use with gfortran on Unix-Systems is provided. Its head looks lik
     FFLAGS		+= -mfpmath=sse			# optimize math, OPTIONAL
     
     # Parallelization
-    #FPPOPTIONS	= -DopenMPI			# preprocessor directives, enables MPI, disbales OpenMP, EXPERIMENTAL
+    #FPPOPTIONS		= -DopenMPI			# preprocessor directives, enables MPI, disbales OpenMP, EXPERIMENTAL
 
 Edit the prefix if you want a different path for the installation. Comment out
+
     FC		= gfortran
 
 and uncomment 
 
     FC		= mpif90
-    FPPOPTIONS = -DopenMPI
+    FPPOPTIONS 	= -DopenMPI
 
 if you would like  to use OpenMPI instead of OpenMP.
 
