@@ -118,7 +118,7 @@ INTERFACE
 END INTERFACE
 
 INTERFACE
-	SUBROUTINE DIFF_INT(ConcEnv, DiffVec, DeltaConc)
+	SUBROUTINE DIFF_INT(ConcEnv, DiffVec, DeltaConc, dTime)
 
 		IMPLICIT NONE
 		REAL*8, DIMENSION(-1:,-1:,-1:,:), INTENT(IN) :: ConcEnv
@@ -126,7 +126,7 @@ INTERFACE
 
 		REAL*8, DIMENSION(1:SIZE(DiffVec)), INTENT(OUT) :: DeltaConc
 
-		REAL*8 :: LAPLACIAN
+		REAL*8 :: LAPLACIAN, dTime
 	END SUBROUTINE
 END INTERFACE
 
@@ -456,7 +456,7 @@ DO IntStep = 1, NSteps											! Integrate over time
 			DummyDiffInMat(0,0,+1,:) = PipeConc(PointX,PointY,PointZ+1,:,1)
 		END IF
 
-		CALL DIFF_INT(DummyDiffInMat, DiffVecGrid, DeltaConc)
+		CALL DIFF_INT(DummyDiffInMat, DiffVecGrid, DeltaConc, dTime)
 
 		DO lambda = 1, Omega
 			PipeConc(PointX,PointY,PointZ,lambda,2) = DeltaConc(lambda) &

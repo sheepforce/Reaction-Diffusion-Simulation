@@ -7,8 +7,10 @@
 !
 ! DiffConc	--> Output that stores the CHANGES in concentrations of every substance
 !
+! dTime		--> Integration Step Width
+!
 
-SUBROUTINE DIFF_INT(ConcEnv, DiffVec, DeltaConc)
+SUBROUTINE DIFF_INT(ConcEnv, DiffVec, DeltaConc, dTime)
 
 IMPLICIT NONE
 REAL*8, DIMENSION(-1:,-1:,-1:,:), INTENT(IN) :: ConcEnv
@@ -16,7 +18,7 @@ REAL*8, DIMENSION(:), INTENT(IN) :: DiffVec
 
 REAL*8, DIMENSION(1:SIZE(DiffVec)), INTENT(OUT) :: DeltaConc
 
-REAL*8 :: LAPLACIAN
+REAL*8 :: LAPLACIAN, dTime
 INTEGER :: Omega, lambda
 
 INTERFACE
@@ -40,7 +42,7 @@ DeltaConc = 0.0d0
 !!!!!!!!!!!!!!!!!
 
 DO lambda = 1, Omega
-	DeltaConc(lambda) = LAPLACIAN(ConcEnv(-1:+1,-1:+1,-1:+1,lambda)) * DiffVec(lambda)
+	DeltaConc(lambda) = LAPLACIAN(ConcEnv(-1:+1,-1:+1,-1:+1,lambda)) * DiffVec(lambda) * dTime
 END DO
 
 END SUBROUTINE
