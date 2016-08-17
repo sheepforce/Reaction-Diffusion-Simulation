@@ -19,6 +19,7 @@ if __name__ == "__main__":
     fortranInput = ""
     options = argparse.ArgumentParser()
     options.add_argument("-f","--file", help="enter inputfile (path)")
+    options.add_argument("-k","--kinetics", help="generate input for only kinetic simulation", action="store_true")
     args = options.parse_args()
     
     print ("Starting program")
@@ -45,7 +46,74 @@ if __name__ == "__main__":
     if "***pathToExistingFortranInput" in makeBlocks.foundBlocks:
         fortranInput = makeBlocks.getBlockByName("***pathToExistingFortranInput")[0]
         print("Done. Using probably existing fortran input.")
-    else:
+    elif args.kinetics:
+        try:                                                                    #Reaktionsgleichungen parsen
+            parseReactions = ReactionParser(makeBlocks.getBlockByName("***reactions"))
+        except Exception:
+            print ("Error while parsing data. Check your reaction-equations in the input file.")
+            raw_input("Press ENTER to exit program.")
+            exit()
+        try:
+            concentrations = makeBlocks.getBlockByName("***kineticConcentrations")
+        except Exception:
+            print ("Error while parsing data. Check your starting concentrations for kinetic simulation in the input file.")
+            raw_input("Press ENTER to exit program.")
+            exit()
+        print("Done. Start writing overview file for substance assignment.")
+        SUBSTANCES = open(source + "_substances.dat", "w")
+        for i in xrange(len(parseReactions.getSubVec())):
+            print("Subs" + str(i+1) + " = " + parseReactions.getSubVec()[i], file = SUBSTANCES)
+        SUBSTANCES.close()        
+        print("Done. Start generating input for simulation program.")
+        FORTRAN = open("Init_RKS.dat", "w")
+        #integrationStepwidth
+        print(str('%e' % float(makeBlocks.getBlockByName("***integrationStepwidth")[0])).replace("e", "d").replace("+","") + " ! integrationStepwidth", file = FORTRAN)
+        #integrationIntervall
+        print(str('%e' % float(makeBlocks.getBlockByName("***integrationIntervall")[0])).replace("e", "d").replace("+","") + " ! integrationIntervall", file = FORTRAN)
+        #vertical dimension of reaction matrices
+        print(str(len(parseReactions.getEduMat())) + " ! number of reactions", file = FORTRAN)
+        #horizontal dimension of reaction matrices
+        print(str(len(parseReactions.getEduMat()[0])) + " ! number of substances", file = FORTRAN)
+        #integrationmethod
+        print(makeBlocks.getBlockByName("***integrationmethod")[0] + " ! integrationmethod", file = FORTRAN)
+        print("", file = FORTRAN)
+        i = 0
+        while i < len(parseReactions.getEduMat()):
+            j = 0
+            while j < len(parseReactions.getEduMat()[i]):
+                print(parseReactions.getEduMat()[i][j], file = FORTRAN)
+                j+=1
+            i+=1
+        print("", file = FORTRAN)
+        i = 0
+        while i < len(parseReactions.getProMat()):
+            j = 0
+            while j < len(parseReactions.getProMat()[i]):
+                print(parseReactions.getProMat()[i][j], file = FORTRAN)  
+                j+=1
+            i+=1  
+        print("", file = FORTRAN)
+        i = 0
+        while i < len(makeBlocks.getBlockByName("***reactionRateConstants")):
+            print(str('%e' % float(makeBlocks.getBlockByName("***reactionRateConstants")[i])).replace("e", "d").replace("+",""), file = FORTRAN)
+            i+=1
+        print("", file = FORTRAN)
+        i = 0
+        while i < len(concentrations):
+            print(str('%e' % float(concentrations[i])).replace("e", "d").replace("+",""), file = FORTRAN)  
+            i+=1  
+        
+        FORTRAN.close()
+        print("Finished generating FORTRAN-input(kinetics). Parser says bye!")
+        exit()
+    
+    
+    
+    
+    
+    
+      
+    else:  
         print ("Done. Checking minimum information...")
         if not makeBlocks.minimumInfo:
             print ("Not enough data given. Make sure to have one rate constant for each reaction and at least the blocks ***reactions, ***reaction rate constants and ***starting concentrations")
@@ -77,8 +145,8 @@ if __name__ == "__main__":
         SUBSTANCES = open(source + "_substances.dat", "w")
         for i in xrange(len(parseReactions.getSubVec())):
             print("Subs" + str(i+1) + " = " + parseReactions.getSubVec()[i], file = SUBSTANCES)
-        SUBSTANCES.close()        
-        print("Done. Start generating input for simulation program.")  
+            SUBSTANCES.close()        
+            print("Done. Start generating input for simulation program.")  
         
         FORTRAN = open("Init.dat", "w")
         
@@ -172,3 +240,8 @@ if __name__ == "__main__":
         os.system(makeBlocks.getBlockByName("***exec") + " pipe_3devolve") 
         exit()
         
+'''
+Created on 15.08.2016
+
+@author: max
+'''

@@ -23,7 +23,8 @@ class BlockGenerator:
                  "***pipeLength",
                  "***pipeRadius",
                  "***integrationmethod",
-                 "***linearFlowSpeed"
+                 "***linearFlowSpeed",
+                 "***kineticConcentrations"
                  ]
     endTag = "***end"
     clean = []
