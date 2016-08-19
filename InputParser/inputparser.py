@@ -145,8 +145,8 @@ if __name__ == "__main__":
         SUBSTANCES = open(source + "_substances.dat", "w")
         for i in xrange(len(parseReactions.getSubVec())):
             print("Subs" + str(i+1) + " = " + parseReactions.getSubVec()[i], file = SUBSTANCES)
-            SUBSTANCES.close()        
-            print("Done. Start generating input for simulation program.")  
+        SUBSTANCES.close()        
+        print("Done. Start generating input for simulation program.")  
         
         FORTRAN = open("Init.dat", "w")
         
