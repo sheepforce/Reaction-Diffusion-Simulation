@@ -78,18 +78,18 @@ if __name__ == "__main__":
         print(makeBlocks.getBlockByName("***integrationmethod")[0] + " ! integrationmethod", file = FORTRAN)
         print("", file = FORTRAN)
         i = 0
-        while i < len(parseReactions.getEduMat()):
+        while i < len(parseReactions.getEduMat()[0]):
             j = 0
-            while j < len(parseReactions.getEduMat()[i]):
-                print(parseReactions.getEduMat()[i][j], file = FORTRAN)
+            while j < len(parseReactions.getEduMat()):
+                print(parseReactions.getEduMat()[j][i], file = FORTRAN)
                 j+=1
             i+=1
         print("", file = FORTRAN)
         i = 0
-        while i < len(parseReactions.getProMat()):
+        while i < len(parseReactions.getProMat()[0]):
             j = 0
-            while j < len(parseReactions.getProMat()[i]):
-                print(parseReactions.getProMat()[i][j], file = FORTRAN)  
+            while j < len(parseReactions.getProMat()):
+                print(parseReactions.getProMat()[j][i], file = FORTRAN)  
                 j+=1
             i+=1  
         print("", file = FORTRAN)
